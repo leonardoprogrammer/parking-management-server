@@ -10,11 +10,11 @@ public class ParkingSpace {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, length = 9)
-    private String status;
+    @Column(nullable = false, length = 20)
+    private String status; // "AVAILABLE" or "OCCUPIED"
 
     @Column(nullable = false)
     private Long parkingLotId;

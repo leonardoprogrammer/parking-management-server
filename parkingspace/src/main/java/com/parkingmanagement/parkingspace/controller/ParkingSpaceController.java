@@ -22,7 +22,7 @@ public class ParkingSpaceController {
         return new ResponseEntity<>(createdParkingSpace, HttpStatus.CREATED);
     }
 
-    @GetMapping("/parkingLot/{parkingLotId}")
+    @GetMapping("/parking-lot/{parkingLotId}")
     public ResponseEntity<List<ParkingSpace>> getParkingSpacsByParkingLotId(@PathVariable Long parkingLotId) {
         List<ParkingSpace> parkingSpaces = parkingSpaceService.getParkingSpacesByParkingLotId(parkingLotId);
         return new ResponseEntity<>(parkingSpaces, HttpStatus.OK);
