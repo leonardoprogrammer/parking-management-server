@@ -1,55 +1,69 @@
--- Users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    telephone VARCHAR(20),
+    password VARCHAR(255) NOT NULL,
+    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
+    date_alt TIMESTAMP
 );
 
--- Parking lots table
-CREATE TABLE parking_lots (
-    id SERIAL PRIMARY KEY,
-    owner_id INT NOT NULL REFERENCES users(id),
-    name VARCHAR(100) NOT NULL,
+CREATE TABLE reset_password (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    sent_email BOOLEAN NOT NULL,
+    reset BOOLEAN NOT NULL,
+    date_reset TIMESTAMP,
+    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
+    date_alt TIMESTAMP
+);
+
+CREATE TABLE parking (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
+    date_alt TIMESTAMP
 );
 
--- Parking spaces table
-CREATE TABLE parking_spaces (
-    id SERIAL PRIMARY KEY,
-    parking_lot_id INT NOT NULL REFERENCES parking_lots(id),
-    title VARCHAR(50) NOT NULL,
-    is_occupied BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE parking_employee (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
+    employee_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    adder_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
+    date_alt TIMESTAMP
 );
 
--- Vehicles table
-CREATE TABLE vehicles (
-    id SERIAL PRIMARY KEY,
-    license_plate VARCHAR(20) NOT NULL,
-    model VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE employee_permissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	parking_employee_id UUID NOT NULL REFERENCES parking_employee(id) ON DELETE CASCADE,
+    checkin_vehicle BOOLEAN NOT NULL,
+    checkout_vehicle BOOLEAN NOT NULL,
+    add_employee BOOLEAN NOT NULL,
+    change_permissions BOOLEAN NOT NULL,
+    edit_parking BOOLEAN NOT NULL,
+    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
+    date_alt TIMESTAMP,
+    user_alt UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Parking transactions table
-CREATE TABLE parking_transactions (
-    id SERIAL PRIMARY KEY,
-    parking_space_id INT NOT NULL REFERENCES parking_spaces(id),
-    vehicle_id INT NOT NULL REFERENCES vehicles(id),
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP,
-    total_fee NUMERIC(10, 2),
-    is_paid BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Permissions table
-CREATE TABLE permissions (
-    id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id),
-    parking_lot_id INT NOT NULL REFERENCES parking_lots(id),
-    role VARCHAR(50) NOT NULL, -- e.g., "employee", "manager"
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE parked_vehicle (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
+    plate VARCHAR(20) NOT NULL,
+    model VARCHAR(255) NOT NULL,
+    color VARCHAR(50),
+    space VARCHAR(50),
+    entry_date TIMESTAMP NOT NULL,
+    checkin_employee_id UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
+    checkout_date TIMESTAMP,
+    checkout_employee_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    paid BOOLEAN NOT NULL,
+    payment_method VARCHAR(50),
+    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
+    date_alt TIMESTAMP
 );
