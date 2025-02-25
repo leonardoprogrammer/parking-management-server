@@ -2,7 +2,6 @@ package com.parkingmanagement.auth.controller;
 
 import com.parkingmanagement.auth.model.dto.UserDTO;
 import com.parkingmanagement.auth.model.entity.User;
-import com.parkingmanagement.auth.repository.UserRepository;
 import com.parkingmanagement.auth.security.JwtService;
 import com.parkingmanagement.auth.service.UserService;
 import jakarta.validation.Valid;
