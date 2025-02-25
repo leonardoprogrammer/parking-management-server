@@ -1,26 +1,20 @@
 package com.parkingmanagement.parkingmanagement.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "employee_permissions")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class EmployeePermissions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @OneToOne
-    @JoinColumn(name = "parking_employee_id", nullable = false)
-    private ParkingEmployee parkingEmployee;
+    @Column(nullable = false)
+    private UUID employeeId;
 
     @Column(nullable = false)
     private boolean checkinVehicle;
@@ -38,11 +32,93 @@ public class EmployeePermissions {
     private boolean editParking;
 
     @Column(nullable = false)
-    private LocalDateTime dateInc = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime dateAlt;
+    private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_alt", nullable = false)
-    private User userAlt;
+    @Column(nullable = false)
+    private UUID updateUser;
+
+    public EmployeePermissions() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(UUID employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public boolean isCheckinVehicle() {
+        return checkinVehicle;
+    }
+
+    public void setCheckinVehicle(boolean checkinVehicle) {
+        this.checkinVehicle = checkinVehicle;
+    }
+
+    public boolean isCheckoutVehicle() {
+        return checkoutVehicle;
+    }
+
+    public void setCheckoutVehicle(boolean checkoutVehicle) {
+        this.checkoutVehicle = checkoutVehicle;
+    }
+
+    public boolean isAddEmployee() {
+        return addEmployee;
+    }
+
+    public void setAddEmployee(boolean addEmployee) {
+        this.addEmployee = addEmployee;
+    }
+
+    public boolean isChangePermissions() {
+        return changePermissions;
+    }
+
+    public void setChangePermissions(boolean changePermissions) {
+        this.changePermissions = changePermissions;
+    }
+
+    public boolean isEditParking() {
+        return editParking;
+    }
+
+    public void setEditParking(boolean editParking) {
+        this.editParking = editParking;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public UUID getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(UUID updateUser) {
+        this.updateUser = updateUser;
+    }
 }

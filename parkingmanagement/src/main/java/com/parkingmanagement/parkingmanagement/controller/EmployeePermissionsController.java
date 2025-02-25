@@ -23,8 +23,8 @@ public class EmployeePermissionsController {
     }
 
     @GetMapping("/employee/{id}")
-    public ResponseEntity<EmployeePermissions> getByParkingEmployeeId(@PathVariable UUID parkingEomployeeId) {
-        return employeePermissionsService.findByParkingEmployeeId(parkingEomployeeId)
+    public ResponseEntity<EmployeePermissions> getByEmployeeId(@PathVariable UUID employeeId) {
+        return employeePermissionsService.findByEmployeeId(employeeId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

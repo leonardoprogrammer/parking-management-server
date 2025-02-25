@@ -8,5 +8,7 @@ import java.util.UUID;
 
 public interface EmployeePermissionsRepository extends JpaRepository<EmployeePermissions, UUID> {
 
-    Optional<EmployeePermissions> findByParkingEmployeeId(UUID parkingEmployeeId);
+    Optional<EmployeePermissions> findByEmployeeId(UUID employeeId);
+
+    void deleteByEmployeeId(UUID employeeId);
 }

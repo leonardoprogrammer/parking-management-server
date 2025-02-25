@@ -5,6 +5,7 @@ import com.parkingmanagement.parkingmanagement.repository.ParkingEmployeeReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +21,10 @@ public class ParkingEmployeeService {
 
     public Optional<ParkingEmployee> findByParkingId(UUID parkingId) {
         return parkingEmployeeRepository.findByParkingId(parkingId);
+    }
+
+    public List<ParkingEmployee> findByUserId(UUID userId) {
+        return parkingEmployeeRepository.findByUserId(userId);
     }
 
     public ParkingEmployee save(ParkingEmployee parkingEmployee) {

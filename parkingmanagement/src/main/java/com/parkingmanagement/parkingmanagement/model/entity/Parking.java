@@ -1,26 +1,20 @@
 package com.parkingmanagement.parkingmanagement.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "parking")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Parking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_creator_id", nullable = false)
-    private User userCreator;
+    @Column(nullable = false)
+    private UUID userCreatorId;
 
     @Column(nullable = false)
     private String name;
@@ -29,7 +23,58 @@ public class Parking {
     private String address;
 
     @Column(nullable = false)
-    private LocalDateTime dateInc = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime dateAlt;
+    private LocalDateTime updateAt;
+
+    public Parking() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getUserCreatorId() {
+        return userCreatorId;
+    }
+
+    public void setUserCreatorId(UUID userCreatorId) {
+        this.userCreatorId = userCreatorId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
+    }
 }
