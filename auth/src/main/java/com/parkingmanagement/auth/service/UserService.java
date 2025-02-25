@@ -2,7 +2,6 @@ package com.parkingmanagement.auth.service;
 
 import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,24 +31,27 @@ public class UserService implements UserDetailsService {
                         .password(user.getPassword())
                         .authorities(List.of()) // Replace with actual roles/authorities if available
                         .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o e-mail: " + email));
     }
 
-    public User registerUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email is already in use");
-        }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User save(User user) {
         return userRepository.save(user);
-    }
-
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 
     public Optional<User> findById(UUID id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public boolean existsByCpf(String cpf) {
+        return userRepository.existsByCpf(cpf);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     public void delete(UUID id) {

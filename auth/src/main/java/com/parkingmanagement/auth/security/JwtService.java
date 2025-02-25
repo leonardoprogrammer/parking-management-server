@@ -59,7 +59,7 @@ public class JwtService {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
             return generateToken((UserDetails) authentication.getPrincipal());
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid credentials");
+            throw new BadCredentialsException("Credenciais inválidas");
         }
     }
 

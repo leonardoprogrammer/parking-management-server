@@ -1,16 +1,17 @@
 package com.parkingmanagement.auth.controller;
 
+import com.parkingmanagement.auth.model.dto.UserDTO;
 import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.repository.UserRepository;
 import com.parkingmanagement.auth.security.JwtService;
+import com.parkingmanagement.auth.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -19,14 +20,13 @@ import java.util.Map;
 public class AuthController {
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public AuthController(JwtService jwtService, UserRepository userRepository,
-                          PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthController(JwtService jwtService, UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
     }
@@ -43,13 +43,25 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+    public ResponseEntity<User> register(@Valid @RequestBody UserDTO userDTO) {
+        if (userService.existsByEmail(userDTO.getEmail())) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (userService.existsByCpf(userDTO.getCpf())) {
             return ResponseEntity.badRequest().build();
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User savedUser = userRepository.save(user);
+        User newUser = new User();
+        BeanUtils.copyProperties(userDTO, newUser);
+        newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+        User savedUser = userService.save(newUser);
+
         return ResponseEntity.ok(savedUser);
+    }
+
+    @PostMapping("/passwordEncoder")
+    public ResponseEntity<String> passwordEncoderTest(@RequestBody String password) {
+        return ResponseEntity.ok(passwordEncoder.encode(password));
     }
 }
