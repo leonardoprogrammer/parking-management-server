@@ -5,8 +5,8 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     telephone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
-    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    date_alt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE reset_password (
@@ -14,10 +14,11 @@ CREATE TABLE reset_password (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     email VARCHAR(255) NOT NULL,
     sent_email BOOLEAN NOT NULL,
+	date_expiration TIMESTAMP NOT NULL,
     reset BOOLEAN NOT NULL,
     date_reset TIMESTAMP,
-    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    date_alt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE parking (
@@ -25,8 +26,8 @@ CREATE TABLE parking (
     user_creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
-    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    date_alt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE parking_employee (
@@ -34,8 +35,8 @@ CREATE TABLE parking_employee (
 	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
     employee_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     adder_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    date_alt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE employee_permissions (
@@ -47,8 +48,8 @@ CREATE TABLE employee_permissions (
     change_permissions BOOLEAN NOT NULL,
     edit_parking BOOLEAN NOT NULL,
     date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    date_alt TIMESTAMP,
-    user_alt UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    created_at TIMESTAMP,
+    updated_at UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE parked_vehicle (
@@ -64,6 +65,6 @@ CREATE TABLE parked_vehicle (
     checkout_employee_id UUID REFERENCES users(id) ON DELETE SET NULL,
     paid BOOLEAN NOT NULL,
     payment_method VARCHAR(50),
-    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    date_alt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP
 );

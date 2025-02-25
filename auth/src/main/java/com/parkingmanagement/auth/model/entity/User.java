@@ -29,9 +29,9 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private LocalDateTime dateInc = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime dateAlt;
+    private LocalDateTime updatedAlt;
 
     public User() {
     }
@@ -84,19 +84,19 @@ public class User {
         this.password = password;
     }
 
-    public LocalDateTime getDateInc() {
-        return dateInc;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setDateInc(LocalDateTime dateInc) {
-        this.dateInc = dateInc;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LocalDateTime getDateAlt() {
-        return dateAlt;
+    public LocalDateTime getUpdatedAlt() {
+        return updatedAlt;
     }
 
-    public void setDateAlt(LocalDateTime dateAlt) {
-        this.dateAlt = dateAlt;
+    public void setUpdatedAlt(LocalDateTime updatedAlt) {
+        this.updatedAlt = updatedAlt;
     }
 }
