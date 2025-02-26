@@ -36,6 +36,6 @@ public class ParkingEmployeeController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
-        parkingEmployeeService.delete(id);
+        parkingEmployeeService.deleteById(id);
     }
 }

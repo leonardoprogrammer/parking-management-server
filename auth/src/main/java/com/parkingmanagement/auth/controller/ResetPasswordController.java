@@ -6,9 +6,11 @@ import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.service.ResetPasswordService;
 import com.parkingmanagement.auth.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -29,13 +31,14 @@ public class ResetPasswordController {
 
     @PostMapping("/request")
     public ResponseEntity<String> requestResetPassword(@RequestParam String email) {
-        User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma conta encontrada com este e-mail"));
 
         ResetPassword newResetPassword = new ResetPassword(user.getId(), user.getEmail());
         ResetPassword savedResetPassword = resetPasswordService.save(newResetPassword);
 
         // enviar e-mail com link
-        // exemplo de link: http://localhost:8080/reset-password/?email=email&id=id
+        // exemplo de link: http://localhost:4200/reset-password/?email={email}&id={id}
 
         savedResetPassword.setSentEmail(true);
         savedResetPassword.setUpdatedAt(LocalDateTime.now());
@@ -46,9 +49,11 @@ public class ResetPasswordController {
 
     @GetMapping("/confirm")
     public ResponseEntity<String> confirmResetPasswordRequest(@RequestParam String email, @RequestParam UUID id) {
-        ResetPassword resetPassword = resetPasswordService.findByIdAndEmail(id, email)
-                .orElseThrow(() -> new RuntimeException("Solicitação de redefinição de senha não encontrada"));
+        ResetPassword resetPassword = resetPasswordService.findByIdAndEmail(id, email).orElse(null);
 
+        if (resetPassword == null) {
+            return ResponseEntity.badRequest().body("Solicitação de redefinição de senha não encontrada");
+        }
         if (resetPassword.isReset()) {
             return ResponseEntity.badRequest().body("Solicitação de redefinição de senha já utilizada");
         }
@@ -61,9 +66,11 @@ public class ResetPasswordController {
 
     @PostMapping
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
-        ResetPassword resetPassword = resetPasswordService.findByIdAndEmail(UUID.fromString(resetPasswordDTO.getId()), resetPasswordDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Solicitação de redefinição de senha não encontrada"));
+        ResetPassword resetPassword = resetPasswordService.findByIdAndEmail(UUID.fromString(resetPasswordDTO.getId()), resetPasswordDTO.getEmail()).orElse(null);
 
+        if (resetPassword == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solicitação de redefinição de senha não encontrada");
+        }
         if (resetPassword.isReset()) {
             return ResponseEntity.badRequest().body("Solicitação de redefinição de senha já utilizada");
         }

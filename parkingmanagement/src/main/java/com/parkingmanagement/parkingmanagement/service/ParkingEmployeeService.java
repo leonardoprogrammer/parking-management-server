@@ -31,7 +31,7 @@ public class ParkingEmployeeService {
         return parkingEmployeeRepository.save(parkingEmployee);
     }
 
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         parkingEmployeeRepository.deleteById(id);
     }
 }

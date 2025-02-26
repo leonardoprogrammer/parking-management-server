@@ -44,7 +44,7 @@ public class ParkingController {
         return ResponseEntity.ok(parkings);
     }
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<Parking> register(@Valid @RequestBody ParkingDTO parkingDTO) {
         if (!userService.existsById(UUID.fromString(parkingDTO.getUserCreatorId()))) {
             return ResponseEntity.badRequest().build();

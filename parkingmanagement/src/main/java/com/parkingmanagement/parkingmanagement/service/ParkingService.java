@@ -14,11 +14,13 @@ import java.util.stream.Collectors;
 public class ParkingService {
 
     private final ParkingRepository parkingRepository;
+    private final ParkedVehicleService parkedVehicleService;
     private final ParkingEmployeeService parkingEmployeeService;
     private final EmployeePermissionsService employeePermissionsService;
 
-    public ParkingService(ParkingRepository parkingRepository, ParkingEmployeeService parkingEmployeeService, EmployeePermissionsService employeePermissionsService) {
+    public ParkingService(ParkingRepository parkingRepository, ParkedVehicleService parkedVehicleService, ParkingEmployeeService parkingEmployeeService, EmployeePermissionsService employeePermissionsService) {
         this.parkingRepository = parkingRepository;
+        this.parkedVehicleService = parkedVehicleService;
         this.parkingEmployeeService = parkingEmployeeService;
         this.employeePermissionsService = employeePermissionsService;
     }
@@ -47,10 +49,12 @@ public class ParkingService {
     }
 
     public void delete(UUID id) {
+        parkedVehicleService.deleteByParkingId(id);
+
         List<ParkingEmployee> employees = parkingEmployeeService.findByParkingId(id).stream().toList();
         for (ParkingEmployee employee : employees) {
             employeePermissionsService.deleteByEmployeeId(employee.getId());
-            parkingEmployeeService.delete(employee.getId());
+            parkingEmployeeService.deleteById(employee.getId());
         }
 
         parkingRepository.deleteById(id);
