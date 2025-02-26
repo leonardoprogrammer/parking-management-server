@@ -3,6 +3,7 @@ package com.parkingmanagement.auth.controller;
 import com.parkingmanagement.auth.model.dto.ResetPasswordDTO;
 import com.parkingmanagement.auth.model.entity.ResetPassword;
 import com.parkingmanagement.auth.model.entity.User;
+import com.parkingmanagement.auth.service.EmailService;
 import com.parkingmanagement.auth.service.ResetPasswordService;
 import com.parkingmanagement.auth.service.UserService;
 import jakarta.validation.Valid;
@@ -22,11 +23,13 @@ public class ResetPasswordController {
     private final ResetPasswordService resetPasswordService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailservice;
 
-    public ResetPasswordController(ResetPasswordService resetPasswordService, UserService userService, PasswordEncoder passwordEncoder) {
+    public ResetPasswordController(ResetPasswordService resetPasswordService, UserService userService, PasswordEncoder passwordEncoder, EmailService emailservice) {
         this.resetPasswordService = resetPasswordService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.emailservice = emailservice;
     }
 
     @PostMapping("/request")
@@ -37,8 +40,9 @@ public class ResetPasswordController {
         ResetPassword newResetPassword = new ResetPassword(user.getId(), user.getEmail());
         ResetPassword savedResetPassword = resetPasswordService.save(newResetPassword);
 
-        // enviar e-mail com link
-        // exemplo de link: http://localhost:4200/reset-password/?email={email}&id={id}
+        String resetLink = "http://localhost:4200/reset-password?email=" + email + "&id=" + savedResetPassword.getId();
+
+        emailservice.sendResetPasswordEmail(email, resetLink);
 
         savedResetPassword.setSentEmail(true);
         savedResetPassword.setUpdatedAt(LocalDateTime.now());
