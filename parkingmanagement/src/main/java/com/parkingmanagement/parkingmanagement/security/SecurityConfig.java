@@ -3,6 +3,7 @@ package com.parkingmanagement.parkingmanagement.security;
 import com.parkingmanagement.parkingmanagement.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,6 +33,7 @@ public class SecurityConfig {
                                                    JwtAuthenticationFilter jwtAuthFilter,
                                                    AuthenticationProvider authenticationProvider) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/test/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
