@@ -46,6 +46,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
+    public UUID getUserIdByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        return user != null ? user.getId() : null;
+    }
+
     public boolean existsByCpf(String cpf) {
         return userRepository.existsByCpf(cpf);
     }

@@ -30,6 +30,12 @@ public class Parking {
     public Parking() {
     }
 
+    public Parking(UUID userCreatorId, String name, String address) {
+        this.userCreatorId = userCreatorId;
+        this.name = name;
+        this.address = address;
+    }
+
     public UUID getId() {
         return id;
     }

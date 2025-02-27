@@ -45,13 +45,14 @@ public class ParkingController {
     }
 
     @PostMapping
-    public ResponseEntity<Parking> register(@Valid @RequestBody ParkingDTO parkingDTO) {
-        if (!userService.existsById(UUID.fromString(parkingDTO.getUserCreatorId()))) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Object> register(@Valid @RequestBody ParkingDTO parkingDTO) {
+        UUID userCreatorid = UUID.fromString(parkingDTO.getUserCreatorId());
+
+        if (!userService.existsById(userCreatorid)) {
+            return ResponseEntity.badRequest().body("Não há usuário com este ID");
         }
 
-        Parking newParking = new Parking();
-        BeanUtils.copyProperties(parkingDTO, newParking);
+        Parking newParking = new Parking(userCreatorid, parkingDTO.getName(), parkingDTO.getAddress());
 
         Parking savedParking = parkingService.save(newParking);
 

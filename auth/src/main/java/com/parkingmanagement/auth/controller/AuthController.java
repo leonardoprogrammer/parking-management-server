@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,8 +38,9 @@ public class AuthController {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         String token = jwtService.authenticate(email, password);
+        UUID userId = userService.getUserIdByEmail(email);
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(Map.of("token", token, "userId", userId.toString()));
     }
 
     @PostMapping("/register")
