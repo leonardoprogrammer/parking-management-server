@@ -34,8 +34,6 @@ public class EmployeePermissions {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime updatedAt;
-
     @Column(nullable = false)
     private UUID updateUser;
 
@@ -104,14 +102,6 @@ public class EmployeePermissions {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public UUID getUpdateUser() {

@@ -31,7 +31,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime updatedAlt;
+    private LocalDateTime updatedAt;
 
     public User() {
     }
@@ -92,11 +92,11 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAlt() {
-        return updatedAlt;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatedAlt(LocalDateTime updatedAlt) {
-        this.updatedAlt = updatedAlt;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
