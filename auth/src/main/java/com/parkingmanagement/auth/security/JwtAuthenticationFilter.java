@@ -1,6 +1,6 @@
 package com.parkingmanagement.auth.security;
 
-import com.parkingmanagement.auth.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String userEmail = jwtService.extractUsername(token);
+        //String userEmail = jwtService.extractUsername(token);
+        String userEmail;
+
+        try {
+            userEmail = jwtService.extractUsername(token);
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token expirado.");
+            return;
+        }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
