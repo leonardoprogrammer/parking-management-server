@@ -19,12 +19,16 @@ public class ParkingEmployeeService {
         return parkingEmployeeRepository.findById(id);
     }
 
-    public Optional<ParkingEmployee> findByParkingId(UUID parkingId) {
-        return parkingEmployeeRepository.findByParkingId(parkingId);
+    public Optional<ParkingEmployee> findByParkingIdAndUserId(UUID parkingId, UUID userId) {
+        return parkingEmployeeRepository.findByParkingIdAndUserId(parkingId, userId);
     }
 
     public List<ParkingEmployee> findByUserId(UUID userId) {
         return parkingEmployeeRepository.findByUserId(userId);
+    }
+
+    public List<ParkingEmployee> findByParkingId(UUID parkingId) {
+        return parkingEmployeeRepository.findByParkingId(parkingId);
     }
 
     public ParkingEmployee save(ParkingEmployee parkingEmployee) {

@@ -1,13 +1,14 @@
 package com.parkingmanagement.parkingmanagement.service;
 
+import com.parkingmanagement.parkingmanagement.model.entity.User;
 import com.parkingmanagement.parkingmanagement.repository.UserRepository;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -19,6 +20,14 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
     public boolean existsById(UUID id) {
         return userRepository.existsById(id);
     }
@@ -26,7 +35,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
-                .map(user -> User
+                .map(user -> org.springframework.security.core.userdetails.User
                         .withUsername(user.getEmail())
                         .password(user.getPassword())
                         .authorities(List.of())

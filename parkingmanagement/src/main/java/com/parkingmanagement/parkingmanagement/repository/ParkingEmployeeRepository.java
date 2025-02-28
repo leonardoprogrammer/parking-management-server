@@ -9,9 +9,11 @@ import java.util.UUID;
 
 public interface ParkingEmployeeRepository extends JpaRepository<ParkingEmployee, UUID> {
 
-    Optional<ParkingEmployee> findByParkingId(UUID parkingId);
-
     List<ParkingEmployee> findByUserId(UUID userId);
 
+    List<ParkingEmployee> findByParkingId(UUID parkingId);
+
     void deleteByParkingId(UUID parkingId);
+
+    Optional<ParkingEmployee> findByParkingIdAndUserId(UUID parkingId, UUID userId);
 }

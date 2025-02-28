@@ -2,10 +2,12 @@ package com.parkingmanagement.parkingmanagement.controller;
 
 import com.parkingmanagement.parkingmanagement.model.dto.ParkingDTO;
 import com.parkingmanagement.parkingmanagement.model.entity.Parking;
+import com.parkingmanagement.parkingmanagement.model.entity.User;
+import com.parkingmanagement.parkingmanagement.security.SecuritytUtils;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
 import com.parkingmanagement.parkingmanagement.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,12 +63,19 @@ public class ParkingController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable UUID id) {
-        if (!parkingService.existsById(id)) {
-            return ResponseEntity.notFound().build();
+        Parking parking = parkingService.findById(id).orElse(null);
+
+        if (parking == null) {
+            return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
+        }
+
+        User user = userService.findById(parking.getUserCreatorId()).orElse(null);
+        if (!SecuritytUtils.isCurrentUser(user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         parkingService.delete(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Estacionamento apagado");
     }
 }

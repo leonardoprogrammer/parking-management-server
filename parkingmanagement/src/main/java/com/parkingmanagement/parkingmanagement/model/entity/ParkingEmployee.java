@@ -30,6 +30,12 @@ public class ParkingEmployee {
     public ParkingEmployee() {
     }
 
+    public ParkingEmployee(UUID parkingId, UUID userId, String adderUserName) {
+        this.parkingId = parkingId;
+        this.userId = userId;
+        this.adderUserName = adderUserName;
+    }
+
     public UUID getId() {
         return id;
     }

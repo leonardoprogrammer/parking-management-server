@@ -51,7 +51,7 @@ public class ParkingService {
     public void delete(UUID id) {
         parkedVehicleService.deleteByParkingId(id);
 
-        List<ParkingEmployee> employees = parkingEmployeeService.findByParkingId(id).stream().toList();
+        List<ParkingEmployee> employees = parkingEmployeeService.findByParkingId(id);
         for (ParkingEmployee employee : employees) {
             employeePermissionsService.deleteByEmployeeId(employee.getId());
             parkingEmployeeService.deleteById(employee.getId());
