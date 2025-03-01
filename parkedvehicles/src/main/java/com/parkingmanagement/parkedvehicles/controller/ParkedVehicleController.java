@@ -122,11 +122,60 @@ public class ParkedVehicleController {
 
         ParkedVehicle savedParkedVehicle = parkedVehicleService.save(newParkedVehicle);
 
-        return ResponseEntity.ok(newParkedVehicle);
+        return ResponseEntity.ok(savedParkedVehicle);
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<Object> checkout(@Valid @RequestParam CheckoutParkedVehicleDTO checkoutParkedVehicleDTO) {
+    public ResponseEntity<Object> checkout(@Valid @RequestBody CheckoutParkedVehicleDTO checkoutParkedVehicleDTO) {
+        ParkedVehicle parkedVehicle = parkedVehicleService.findById(UUID.fromString(checkoutParkedVehicleDTO.getParkedVehicleId())).orElse(null);
+        UUID checkoutEmployeeId = UUID.fromString(checkoutParkedVehicleDTO.getCheckoutEmployeeId());
+
+        if (parkedVehicle == null) {
+            return ResponseEntity.badRequest().body("Não há veículo estacionado com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkedVehicle.getParkingId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = userService.findById(checkoutEmployeeId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Não há usuário com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(user.getEmail(), parkedVehicle.getParkingId())) {
+            return ResponseEntity.badRequest().body("O usuário não é funcionário deste estacionamento");
+        }
+
+        LocalDateTime checkoutDate;
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        try {
+            checkoutDate = LocalDateTime.parse(checkoutParkedVehicleDTO.getCheckoutDate(), formatter);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("A data de saída é inválida");
+        }
+
+        if (checkoutDate.isBefore(parkedVehicle.getEntryDate())) {
+            return ResponseEntity.badRequest().body("A data de saída não pode ser menor que a data de entrada");
+        }
+
+        if (checkoutParkedVehicleDTO.isPaid()
+                && (checkoutParkedVehicleDTO.getPaymentMethod() == null || checkoutParkedVehicleDTO.getPaymentMethod().isBlank())) {
+            return ResponseEntity.badRequest().body("O método de pagamento é obrigatório quando o pagamento é efetuado");
+        }
+
+        if ((checkoutParkedVehicleDTO.getPaymentMethod() != null && !checkoutParkedVehicleDTO.getPaymentMethod().isBlank())
+                && !checkoutParkedVehicleDTO.isPaid()) {
+            return ResponseEntity.badRequest().body("O pagamento não foi efetuado, mas um método de pagamento foi informado");
+        }
+
+        parkedVehicle.setCheckoutDate(checkoutDate);
+        parkedVehicle.setCheckoutEmployeeId(checkoutEmployeeId);
+        parkedVehicle.setPaid(checkoutParkedVehicleDTO.isPaid());
+        parkedVehicle.setPaymentMethod(checkoutParkedVehicleDTO.getPaymentMethod());
+        parkedVehicle.setUpdatedAt(LocalDateTime.now());
+        parkedVehicleService.save(parkedVehicle);
+
         return ResponseEntity.ok().build();
     }
 }

@@ -1,9 +1,14 @@
 package com.parkingmanagement.parkedvehicles.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.UUID;
 
 public class CheckoutParkedVehicleDTO {
+
+    @NotBlank(message = "'parkedVehicleId' é obrigatório")
+    @UUID(message = "'parkedVehicleId' é inválido")
+    private String parkedVehicleId;
 
     @NotBlank(message = "'checkoutDate' é obrigatório")
     private String checkoutDate;
@@ -12,10 +17,18 @@ public class CheckoutParkedVehicleDTO {
     @UUID(message = "'checkoutEmployeeId' é inválido")
     private String checkoutEmployeeId;
 
-    @NotBlank(message = "'paid' é obrigatório")
+    @NotNull(message = "'paid' é obrigatório")
     private boolean paid;
 
     private String paymentMethod;
+
+    public String getParkedVehicleId() {
+        return parkedVehicleId;
+    }
+
+    public void setParkedVehicleId(String parkedVehicleId) {
+        this.parkedVehicleId = parkedVehicleId;
+    }
 
     public String getCheckoutDate() {
         return checkoutDate;
