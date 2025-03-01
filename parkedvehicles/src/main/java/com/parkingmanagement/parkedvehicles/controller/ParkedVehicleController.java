@@ -2,6 +2,7 @@ package com.parkingmanagement.parkedvehicles.controller;
 
 import com.parkingmanagement.parkedvehicles.model.dto.CheckinParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.dto.CheckoutParkedVehicleDTO;
+import com.parkingmanagement.parkedvehicles.model.dto.ParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
 import com.parkingmanagement.parkedvehicles.model.entity.User;
 import com.parkingmanagement.parkedvehicles.security.SecurityService;
@@ -38,7 +39,7 @@ public class ParkedVehicleController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ParkedVehicle> getById(@PathVariable UUID id) {
+    public ResponseEntity<Object> getById(@PathVariable UUID id) {
         ParkedVehicle parkedVehicle = parkedVehicleService.findById(id).orElse(null);
         if (parkedVehicle == null) {
             return ResponseEntity.notFound().build();
@@ -49,6 +50,33 @@ public class ParkedVehicleController {
         }
 
         return ResponseEntity.ok(parkedVehicle);
+    }
+
+    @GetMapping("/{id}/checkin")
+    public ResponseEntity<Object> getCheckinParkedVehicleById(@PathVariable UUID id) {
+        ParkedVehicle parkedVehicle = parkedVehicleService.findById(id).orElse(null);
+        if (parkedVehicle == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkedVehicle.getParkingId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User userEmployee = userService.findById(parkedVehicle.getCheckinEmployeeId()).orElse(null);
+
+        ParkedVehicleDTO parkedVehicleDTO = new ParkedVehicleDTO(
+                parkedVehicle.getParkingId(),
+                parkedVehicle.getPlate(),
+                parkedVehicle.getModel(),
+                parkedVehicle.getColor(),
+                parkedVehicle.getSpace(),
+                parkedVehicle.getEntryDate(),
+                userEmployee.getName(),
+                parkedVehicle.getCreatedAt()
+        );
+
+        return ResponseEntity.ok(parkedVehicleDTO);
     }
 
     @GetMapping("/parking/{parkingId}")
