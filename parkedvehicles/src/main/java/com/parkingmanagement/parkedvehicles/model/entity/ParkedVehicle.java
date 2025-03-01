@@ -16,14 +16,16 @@ public class ParkedVehicle {
     @Column(nullable = false)
     private UUID parkingId;
 
-    @Column(nullable = false)
+    @Column(length = 20, nullable = false)
     private String plate;
 
     @Column(nullable = false)
     private String model;
 
+    @Column(length = 50)
     private String color;
 
+    @Column(length = 50)
     private String space;
 
     @Column(nullable = false)
@@ -47,6 +49,16 @@ public class ParkedVehicle {
     private LocalDateTime updatedAt;
 
     public ParkedVehicle() {
+    }
+
+    public ParkedVehicle(UUID parkingId, String plate, String model, String color, String space, LocalDateTime entryDate, UUID checkinEmployeeId) {
+        this.parkingId = parkingId;
+        this.plate = plate;
+        this.model = model;
+        this.color = color;
+        this.space = space;
+        this.entryDate = entryDate;
+        this.checkinEmployeeId = checkinEmployeeId;
     }
 
     public UUID getId() {

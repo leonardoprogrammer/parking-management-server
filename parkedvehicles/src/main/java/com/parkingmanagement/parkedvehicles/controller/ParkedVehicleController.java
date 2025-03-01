@@ -1,14 +1,23 @@
 package com.parkingmanagement.parkedvehicles.controller;
 
+import com.parkingmanagement.parkedvehicles.model.dto.CheckinParkedVehicleDTO;
+import com.parkingmanagement.parkedvehicles.model.dto.CheckoutParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
+import com.parkingmanagement.parkedvehicles.model.entity.User;
 import com.parkingmanagement.parkedvehicles.security.SecurityService;
 import com.parkingmanagement.parkedvehicles.security.SecurityUtils;
 import com.parkingmanagement.parkedvehicles.service.ParkedVehicleService;
+import com.parkingmanagement.parkedvehicles.service.ParkingService;
+import com.parkingmanagement.parkedvehicles.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,10 +27,14 @@ public class ParkedVehicleController {
 
     private final ParkedVehicleService parkedVehicleService;
     private final SecurityService securityService;
+    private final ParkingService parkingService;
+    private final UserService userService;
 
-    public ParkedVehicleController(ParkedVehicleService parkedVehicleService, SecurityService securityService) {
+    public ParkedVehicleController(ParkedVehicleService parkedVehicleService, SecurityService securityService, ParkingService parkingService, UserService userService) {
         this.parkedVehicleService = parkedVehicleService;
         this.securityService = securityService;
+        this.parkingService = parkingService;
+        this.userService = userService;
     }
 
     @GetMapping("{id}")
@@ -63,8 +76,57 @@ public class ParkedVehicleController {
         return parkedVehicleService.getTotalPagesOfParkedVehiclesHistory(parkingId, size);
     }
 
-    @PostMapping
-    public ParkedVehicle add(@RequestBody ParkedVehicle parkedVehicle) {
-        return parkedVehicleService.save(parkedVehicle);
+    @PostMapping("/checkin")
+    public ResponseEntity<Object> checkin(@Valid @RequestBody CheckinParkedVehicleDTO checkinParkedVehicleDTO) {
+        UUID parkingId = UUID.fromString(checkinParkedVehicleDTO.getParkingId());
+        UUID userEmployeeId = UUID.fromString(checkinParkedVehicleDTO.getCheckinEmployeeId());
+        LocalDateTime entryDate;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        try {
+            entryDate = LocalDateTime.parse(checkinParkedVehicleDTO.getEntryDate(), formatter);
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("A data de entrada é inválida");
+        }
+
+        if (!parkingService.existsById(parkingId)) {
+            return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = userService.findById(userEmployeeId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Não há usuário com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(user.getEmail(), parkingId)) {
+            return ResponseEntity.badRequest().body("O usuário não é funcionário deste estacionamento");
+        }
+
+        if (entryDate.isAfter(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body("A data de entrada não pode ser maior que a data atual");
+        }
+
+        ParkedVehicle newParkedVehicle = new ParkedVehicle(
+                parkingId,
+                checkinParkedVehicleDTO.getPlate(),
+                checkinParkedVehicleDTO.getModel(),
+                checkinParkedVehicleDTO.getColor(),
+                checkinParkedVehicleDTO.getSpace(),
+                entryDate,
+                userEmployeeId
+        );
+
+        ParkedVehicle savedParkedVehicle = parkedVehicleService.save(newParkedVehicle);
+
+        return ResponseEntity.ok(newParkedVehicle);
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<Object> checkout(@Valid @RequestParam CheckoutParkedVehicleDTO checkoutParkedVehicleDTO) {
+        return ResponseEntity.ok().build();
     }
 }

@@ -14,6 +14,10 @@ public class ParkingService {
         this.parkingRepository = parkingRepository;
     }
 
+    public boolean existsById(UUID id) {
+        return parkingRepository.existsById(id);
+    }
+
     public boolean existsByUserCreatorIdAndId(UUID userId, UUID parkingId) {
         return parkingRepository.existsByUserCreatorIdAndId(userId, parkingId);
     }

@@ -2,7 +2,6 @@ package com.parkingmanagement.parkedvehicles.service;
 
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
 import com.parkingmanagement.parkedvehicles.repository.ParkedVehicleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +14,15 @@ import java.util.UUID;
 @Service
 public class ParkedVehicleService {
 
-    @Autowired
-    private ParkedVehicleRepository parkedVehicleRepository;
+    private final ParkedVehicleRepository parkedVehicleRepository;
+
+    public ParkedVehicleService(ParkedVehicleRepository parkedVehicleRepository) {
+        this.parkedVehicleRepository = parkedVehicleRepository;
+    }
+
+    public ParkedVehicle save(ParkedVehicle parkedVehicle) {
+        return parkedVehicleRepository.save(parkedVehicle);
+    }
 
     public Optional<ParkedVehicle> findById(UUID id) {
         return parkedVehicleRepository.findById(id);
@@ -34,10 +40,6 @@ public class ParkedVehicleService {
     public long getTotalPagesOfParkedVehiclesHistory(UUID parkingId, Integer size) {
         long totalRecords = parkedVehicleRepository.countByParkingId(parkingId);
         return (totalRecords / size);
-    }
-
-    public ParkedVehicle save(ParkedVehicle parkedVehicle) {
-        return parkedVehicleRepository.save(parkedVehicle);
     }
 
     public void delete(UUID id) {

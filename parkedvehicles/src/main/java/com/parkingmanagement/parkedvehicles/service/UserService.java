@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -19,8 +20,16 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id);
+    }
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public boolean existsById(UUID id) {
+        return userRepository.existsById(id);
     }
 
     @Override
