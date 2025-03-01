@@ -27,7 +27,7 @@ public class ParkingEmployeeService {
         return parkingEmployeeRepository.findByUserId(userId);
     }
 
-    public List<ParkingEmployee> findByParkingId(UUID parkingId) {
+    public List<ParkingEmployee> findEmployeesByParkingId(UUID parkingId) {
         return parkingEmployeeRepository.findByParkingId(parkingId);
     }
 
@@ -37,5 +37,9 @@ public class ParkingEmployeeService {
 
     public void deleteById(UUID id) {
         parkingEmployeeRepository.deleteById(id);
+    }
+
+    public boolean existsByUserIdAndParkingId(UUID userId, UUID parkingId) {
+        return parkingEmployeeRepository.existsByUserIdAndParkingId(userId, parkingId);
     }
 }

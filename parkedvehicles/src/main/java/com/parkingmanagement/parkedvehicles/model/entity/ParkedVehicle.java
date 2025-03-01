@@ -1,29 +1,20 @@
 package com.parkingmanagement.parkedvehicles.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "parked_vehicle")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ParkedVehicle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "parking_id", nullable = false)
-    private Parking parking;
+    @Column(nullable = false)
+    private UUID parkingId;
 
     @Column(nullable = false)
     private String plate;
@@ -38,15 +29,12 @@ public class ParkedVehicle {
     @Column(nullable = false)
     private LocalDateTime entryDate;
 
-    @ManyToOne
-    @JoinColumn(name = "checkin_employee_id", nullable = false)
-    private User checkinEmployee;
+    @Column(nullable = false)
+    private UUID checkinEmployeeId;
 
     private LocalDateTime checkoutDate;
 
-    @ManyToOne
-    @JoinColumn(name = "checkout_employee_id")
-    private User checkoutEmployee;
+    private UUID checkoutEmployeeId;
 
     @Column(nullable = false)
     private boolean paid;
@@ -54,7 +42,122 @@ public class ParkedVehicle {
     private String paymentMethod;
 
     @Column(nullable = false)
-    private LocalDateTime dateInc = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime dateAlt;
+    private LocalDateTime updatedAt;
+
+    public ParkedVehicle() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getParkingId() {
+        return parkingId;
+    }
+
+    public void setParkingId(UUID parkingId) {
+        this.parkingId = parkingId;
+    }
+
+    public String getPlate() {
+        return plate;
+    }
+
+    public void setPlate(String plate) {
+        this.plate = plate;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getSpace() {
+        return space;
+    }
+
+    public void setSpace(String space) {
+        this.space = space;
+    }
+
+    public LocalDateTime getEntryDate() {
+        return entryDate;
+    }
+
+    public void setEntryDate(LocalDateTime entryDate) {
+        this.entryDate = entryDate;
+    }
+
+    public UUID getCheckinEmployeeId() {
+        return checkinEmployeeId;
+    }
+
+    public void setCheckinEmployeeId(UUID checkinEmployeeId) {
+        this.checkinEmployeeId = checkinEmployeeId;
+    }
+
+    public LocalDateTime getCheckoutDate() {
+        return checkoutDate;
+    }
+
+    public void setCheckoutDate(LocalDateTime checkoutDate) {
+        this.checkoutDate = checkoutDate;
+    }
+
+    public UUID getCheckoutEmployeeId() {
+        return checkoutEmployeeId;
+    }
+
+    public void setCheckoutEmployeeId(UUID checkoutEmployeeId) {
+        this.checkoutEmployeeId = checkoutEmployeeId;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

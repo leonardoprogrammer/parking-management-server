@@ -22,8 +22,8 @@ public class ParkedVehicleService {
         return parkedVehicleRepository.findById(id);
     }
 
-    public Optional<List<ParkedVehicle>> findParkedVehiclesByParkingId(UUID parkingId) {
-        return Optional.ofNullable(parkedVehicleRepository.findParkedVehiclesByParkingId(parkingId));
+    public List<ParkedVehicle> findParkedVehiclesByParkingId(UUID parkingId) {
+        return parkedVehicleRepository.findParkedVehiclesByParkingId(parkingId);
     }
 
     public Page<ParkedVehicle> getParkedVehiclesHistoryByParkingId(UUID parkingId, Integer page, Integer size) {

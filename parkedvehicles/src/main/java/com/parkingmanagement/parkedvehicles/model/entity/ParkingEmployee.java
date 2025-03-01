@@ -6,28 +6,28 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "parking")
-public class Parking {
+@Table(name = "parking_employee")
+public class ParkingEmployee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(nullable = false)
-    private UUID userCreatorId;
+    private UUID parkingId;
 
     @Column(nullable = false)
-    private String name;
+    private UUID userId;
 
     @Column(nullable = false)
-    private String address;
+    private String adderUserName;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt;
 
-    public Parking() {
+    public ParkingEmployee() {
     }
 
     public UUID getId() {
@@ -38,28 +38,28 @@ public class Parking {
         this.id = id;
     }
 
-    public UUID getUserCreatorId() {
-        return userCreatorId;
+    public UUID getParkingId() {
+        return parkingId;
     }
 
-    public void setUserCreatorId(UUID userCreatorId) {
-        this.userCreatorId = userCreatorId;
+    public void setParkingId(UUID parkingId) {
+        this.parkingId = parkingId;
     }
 
-    public String getName() {
-        return name;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
-    public String getAddress() {
-        return address;
+    public String getAdderUserName() {
+        return adderUserName;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAdderUserName(String adderUserName) {
+        this.adderUserName = adderUserName;
     }
 
     public LocalDateTime getCreatedAt() {

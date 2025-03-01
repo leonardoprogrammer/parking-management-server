@@ -16,4 +16,6 @@ public interface ParkingEmployeeRepository extends JpaRepository<ParkingEmployee
     void deleteByParkingId(UUID parkingId);
 
     Optional<ParkingEmployee> findByParkingIdAndUserId(UUID parkingId, UUID userId);
+
+    boolean existsByUserIdAndParkingId(UUID userId, UUID parkingId);
 }

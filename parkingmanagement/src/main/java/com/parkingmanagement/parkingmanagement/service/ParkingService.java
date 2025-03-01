@@ -51,12 +51,16 @@ public class ParkingService {
     public void delete(UUID id) {
         parkedVehicleService.deleteByParkingId(id);
 
-        List<ParkingEmployee> employees = parkingEmployeeService.findByParkingId(id);
+        List<ParkingEmployee> employees = parkingEmployeeService.findEmployeesByParkingId(id);
         for (ParkingEmployee employee : employees) {
             employeePermissionsService.deleteByEmployeeId(employee.getId());
             parkingEmployeeService.deleteById(employee.getId());
         }
 
         parkingRepository.deleteById(id);
+    }
+
+    public boolean existsByUserCreatorIdAndId(UUID userId, UUID parkingId) {
+        return parkingRepository.existsByUserCreatorIdAndId(userId, parkingId);
     }
 }

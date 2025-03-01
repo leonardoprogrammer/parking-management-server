@@ -12,8 +12,9 @@ import java.util.UUID;
 
 public interface ParkedVehicleRepository extends JpaRepository<ParkedVehicle, UUID> {
 
-    @Query("SELECT pv FROM ParkedVehicle pv WHERE AND pv.parkingId = :parkingId " +
-            "pv.checkoutDate IS NOT NULL")
+    @Query("SELECT pv FROM ParkedVehicle pv " +
+            "WHERE pv.parkingId = :parkingId " +
+            "AND pv.checkoutDate IS NULL")
     List<ParkedVehicle> findParkedVehiclesByParkingId(@Param("parkingId") UUID parkingId);
 
     List<ParkedVehicle> findByParkingIdAndCheckoutDateIsNotNull(UUID parkingId);
