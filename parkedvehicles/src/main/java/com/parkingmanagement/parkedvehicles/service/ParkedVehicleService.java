@@ -1,10 +1,12 @@
 package com.parkingmanagement.parkedvehicles.service;
 
+import com.parkingmanagement.parkedvehicles.model.dto.ResponseHistoryParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
 import com.parkingmanagement.parkedvehicles.repository.ParkedVehicleRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,14 +34,26 @@ public class ParkedVehicleService {
         return parkedVehicleRepository.findParkedVehiclesByParkingId(parkingId);
     }
 
-    public Page<ParkedVehicle> getParkedVehiclesHistoryByParkingId(UUID parkingId, Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return parkedVehicleRepository.findByParkingId(parkingId, pageable);
+    public Page<ResponseHistoryParkedVehicleDTO> getParkedVehiclesHistoryByParkingId(UUID parkingId, Integer page, Integer sizePage) {
+        Pageable pageable = PageRequest.of((page - 1), sizePage, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<ParkedVehicle> parkedVehiclesPage = parkedVehicleRepository.findByParkingId(parkingId, pageable);
+        return parkedVehiclesPage.map(this::convertToResponseHistoryParkedVehicleDTO);
     }
 
-    public long getTotalPagesOfParkedVehiclesHistory(UUID parkingId, Integer size) {
+    public long getTotalPagesOfParkedVehiclesHistory(UUID parkingId, Integer sizePage) {
         long totalRecords = parkedVehicleRepository.countByParkingId(parkingId);
-        return (totalRecords / size);
+        return (totalRecords / sizePage) + 1;
+    }
+
+    private ResponseHistoryParkedVehicleDTO convertToResponseHistoryParkedVehicleDTO(ParkedVehicle parkedVehicle) {
+        return new ResponseHistoryParkedVehicleDTO(
+                parkedVehicle.getPlate(),
+                parkedVehicle.getModel(),
+                parkedVehicle.getColor(),
+                parkedVehicle.getEntryDate(),
+                parkedVehicle.getCreatedAt(),
+                parkedVehicle.getCheckoutDate() != null
+        );
     }
 
     public void delete(UUID id) {

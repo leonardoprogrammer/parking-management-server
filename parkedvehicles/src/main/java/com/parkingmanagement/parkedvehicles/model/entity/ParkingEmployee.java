@@ -20,7 +20,7 @@ public class ParkingEmployee {
     private UUID userId;
 
     @Column(nullable = false)
-    private String adderUserName;
+    private UUID adderUserId;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -54,12 +54,12 @@ public class ParkingEmployee {
         this.userId = userId;
     }
 
-    public String getAdderUserName() {
-        return adderUserName;
+    public UUID getAdderUserId() {
+        return adderUserId;
     }
 
-    public void setAdderUserName(String adderUserName) {
-        this.adderUserName = adderUserName;
+    public void setAdderUserId(UUID adderUserId) {
+        this.adderUserId = adderUserId;
     }
 
     public LocalDateTime getCreatedAt() {

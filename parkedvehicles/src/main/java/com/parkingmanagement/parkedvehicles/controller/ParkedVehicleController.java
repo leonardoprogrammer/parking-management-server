@@ -1,8 +1,8 @@
 package com.parkingmanagement.parkedvehicles.controller;
 
-import com.parkingmanagement.parkedvehicles.model.dto.CheckinParkedVehicleDTO;
-import com.parkingmanagement.parkedvehicles.model.dto.CheckoutParkedVehicleDTO;
-import com.parkingmanagement.parkedvehicles.model.dto.ParkedVehicleDTO;
+import com.parkingmanagement.parkedvehicles.model.dto.RequestCheckinParkedVehicleDTO;
+import com.parkingmanagement.parkedvehicles.model.dto.RequestCheckoutParkedVehicleDTO;
+import com.parkingmanagement.parkedvehicles.model.dto.ResponseCheckinParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
 import com.parkingmanagement.parkedvehicles.model.entity.User;
 import com.parkingmanagement.parkedvehicles.security.SecurityService;
@@ -11,7 +11,6 @@ import com.parkingmanagement.parkedvehicles.service.ParkedVehicleService;
 import com.parkingmanagement.parkedvehicles.service.ParkingService;
 import com.parkingmanagement.parkedvehicles.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +64,7 @@ public class ParkedVehicleController {
 
         User userEmployee = userService.findById(parkedVehicle.getCheckinEmployeeId()).orElse(null);
 
-        ParkedVehicleDTO parkedVehicleDTO = new ParkedVehicleDTO(
+        ResponseCheckinParkedVehicleDTO responseCheckinParkedVehicleDTO = new ResponseCheckinParkedVehicleDTO(
                 parkedVehicle.getParkingId(),
                 parkedVehicle.getPlate(),
                 parkedVehicle.getModel(),
@@ -76,7 +75,7 @@ public class ParkedVehicleController {
                 parkedVehicle.getCreatedAt()
         );
 
-        return ResponseEntity.ok(parkedVehicleDTO);
+        return ResponseEntity.ok(responseCheckinParkedVehicleDTO);
     }
 
     @GetMapping("/parking/{parkingId}")
@@ -94,25 +93,41 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(parkedVehicles);
     }
 
-    @GetMapping("/parking/{parkingId}/history")
-    public Page<ParkedVehicle> getHistoryByParkingId(@PathVariable UUID parkingId, @RequestParam Integer page, @RequestParam Integer size) {
-        return parkedVehicleService.getParkedVehiclesHistoryByParkingId(parkingId, page, size);
+    @GetMapping("/history")
+    public ResponseEntity<Object> getHistoryByParkingId(@RequestParam UUID parkingId, @RequestParam Integer page, @RequestParam Integer sizePage) {
+        if (!parkingService.existsById(parkingId)) {
+            return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(parkedVehicleService.getParkedVehiclesHistoryByParkingId(parkingId, page, sizePage));
     }
 
-    @GetMapping("/parking/{parkingId}/history/total")
-    public Long getTotalHistoryByParkingId(@PathVariable UUID parkingId, @RequestParam Integer size) {
-        return parkedVehicleService.getTotalPagesOfParkedVehiclesHistory(parkingId, size);
+    @GetMapping("/history/totalPages")
+    public ResponseEntity<Object> getTotalHistoryByParkingId(@RequestParam UUID parkingId, @RequestParam Integer sizePage) {
+        if (!parkingService.existsById(parkingId)) {
+            return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(parkedVehicleService.getTotalPagesOfParkedVehiclesHistory(parkingId, sizePage));
     }
 
     @PostMapping("/checkin")
-    public ResponseEntity<Object> checkin(@Valid @RequestBody CheckinParkedVehicleDTO checkinParkedVehicleDTO) {
-        UUID parkingId = UUID.fromString(checkinParkedVehicleDTO.getParkingId());
-        UUID userEmployeeId = UUID.fromString(checkinParkedVehicleDTO.getCheckinEmployeeId());
+    public ResponseEntity<Object> checkin(@Valid @RequestBody RequestCheckinParkedVehicleDTO requestCheckinParkedVehicleDTO) {
+        UUID parkingId = UUID.fromString(requestCheckinParkedVehicleDTO.getParkingId());
+        UUID userEmployeeId = UUID.fromString(requestCheckinParkedVehicleDTO.getCheckinEmployeeId());
         LocalDateTime entryDate;
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         try {
-            entryDate = LocalDateTime.parse(checkinParkedVehicleDTO.getEntryDate(), formatter);
+            entryDate = LocalDateTime.parse(requestCheckinParkedVehicleDTO.getEntryDate(), formatter);
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("A data de entrada é inválida");
         }
@@ -140,10 +155,10 @@ public class ParkedVehicleController {
 
         ParkedVehicle newParkedVehicle = new ParkedVehicle(
                 parkingId,
-                checkinParkedVehicleDTO.getPlate(),
-                checkinParkedVehicleDTO.getModel(),
-                checkinParkedVehicleDTO.getColor(),
-                checkinParkedVehicleDTO.getSpace(),
+                requestCheckinParkedVehicleDTO.getPlate(),
+                requestCheckinParkedVehicleDTO.getModel(),
+                requestCheckinParkedVehicleDTO.getColor(),
+                requestCheckinParkedVehicleDTO.getSpace(),
                 entryDate,
                 userEmployeeId
         );
@@ -154,9 +169,9 @@ public class ParkedVehicleController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<Object> checkout(@Valid @RequestBody CheckoutParkedVehicleDTO checkoutParkedVehicleDTO) {
-        ParkedVehicle parkedVehicle = parkedVehicleService.findById(UUID.fromString(checkoutParkedVehicleDTO.getParkedVehicleId())).orElse(null);
-        UUID checkoutEmployeeId = UUID.fromString(checkoutParkedVehicleDTO.getCheckoutEmployeeId());
+    public ResponseEntity<Object> checkout(@Valid @RequestBody RequestCheckoutParkedVehicleDTO requestCheckoutParkedVehicleDTO) {
+        ParkedVehicle parkedVehicle = parkedVehicleService.findById(UUID.fromString(requestCheckoutParkedVehicleDTO.getParkedVehicleId())).orElse(null);
+        UUID checkoutEmployeeId = UUID.fromString(requestCheckoutParkedVehicleDTO.getCheckoutEmployeeId());
 
         if (parkedVehicle == null) {
             return ResponseEntity.badRequest().body("Não há veículo estacionado com este ID");
@@ -178,7 +193,7 @@ public class ParkedVehicleController {
         LocalDateTime checkoutDate;
         DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         try {
-            checkoutDate = LocalDateTime.parse(checkoutParkedVehicleDTO.getCheckoutDate(), formatter);
+            checkoutDate = LocalDateTime.parse(requestCheckoutParkedVehicleDTO.getCheckoutDate(), formatter);
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("A data de saída é inválida");
         }
@@ -187,20 +202,20 @@ public class ParkedVehicleController {
             return ResponseEntity.badRequest().body("A data de saída não pode ser menor que a data de entrada");
         }
 
-        if (checkoutParkedVehicleDTO.isPaid()
-                && (checkoutParkedVehicleDTO.getPaymentMethod() == null || checkoutParkedVehicleDTO.getPaymentMethod().isBlank())) {
+        if (requestCheckoutParkedVehicleDTO.isPaid()
+                && (requestCheckoutParkedVehicleDTO.getPaymentMethod() == null || requestCheckoutParkedVehicleDTO.getPaymentMethod().isBlank())) {
             return ResponseEntity.badRequest().body("O método de pagamento é obrigatório quando o pagamento é efetuado");
         }
 
-        if ((checkoutParkedVehicleDTO.getPaymentMethod() != null && !checkoutParkedVehicleDTO.getPaymentMethod().isBlank())
-                && !checkoutParkedVehicleDTO.isPaid()) {
+        if ((requestCheckoutParkedVehicleDTO.getPaymentMethod() != null && !requestCheckoutParkedVehicleDTO.getPaymentMethod().isBlank())
+                && !requestCheckoutParkedVehicleDTO.isPaid()) {
             return ResponseEntity.badRequest().body("O pagamento não foi efetuado, mas um método de pagamento foi informado");
         }
 
         parkedVehicle.setCheckoutDate(checkoutDate);
         parkedVehicle.setCheckoutEmployeeId(checkoutEmployeeId);
-        parkedVehicle.setPaid(checkoutParkedVehicleDTO.isPaid());
-        parkedVehicle.setPaymentMethod(checkoutParkedVehicleDTO.getPaymentMethod());
+        parkedVehicle.setPaid(requestCheckoutParkedVehicleDTO.isPaid());
+        parkedVehicle.setPaymentMethod(requestCheckoutParkedVehicleDTO.getPaymentMethod());
         parkedVehicle.setUpdatedAt(LocalDateTime.now());
         parkedVehicleService.save(parkedVehicle);
 

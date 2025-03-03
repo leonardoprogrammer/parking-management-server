@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.UUID;
 
-public class CheckoutParkedVehicleDTO {
+public class RequestCheckoutParkedVehicleDTO {
 
     @NotBlank(message = "'parkedVehicleId' é obrigatório")
     @UUID(message = "'parkedVehicleId' é inválido")

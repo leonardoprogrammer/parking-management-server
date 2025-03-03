@@ -3,7 +3,7 @@ package com.parkingmanagement.parkedvehicles.model.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class ParkedVehicleDTO {
+public class ResponseCheckinParkedVehicleDTO {
 
     private UUID parkingId;
     private String plate;
@@ -14,7 +14,7 @@ public class ParkedVehicleDTO {
     private String checkinEmployeeName;
     private LocalDateTime checkinDate;
 
-    public ParkedVehicleDTO(UUID parkingId, String plate, String model, String color, String space, LocalDateTime entryDate, String checkinEmployeeName, LocalDateTime checkinDate) {
+    public ResponseCheckinParkedVehicleDTO(UUID parkingId, String plate, String model, String color, String space, LocalDateTime entryDate, String checkinEmployeeName, LocalDateTime checkinDate) {
         this.parkingId = parkingId;
         this.plate = plate;
         this.model = model;
