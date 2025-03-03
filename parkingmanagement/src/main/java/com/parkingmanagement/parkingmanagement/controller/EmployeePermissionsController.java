@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -70,5 +71,43 @@ public class EmployeePermissionsController {
         }
 
         return ResponseEntity.ok(permissionsDTO);
+    }
+
+    @PutMapping
+    public ResponseEntity<Object> updateEmployeePermissions(@Valid @RequestBody RequestUpdateEmployeePermissionsDTO requestUpdateEmployeePermissionsDTO,
+                                                            @RequestParam UUID employeeId) {
+        ParkingEmployee parkingEmployee = parkingEmployeeService.findById(employeeId).orElse(null);
+        if (parkingEmployee == null) {
+            return ResponseEntity.badRequest().body("Não há funcionário com este ID");
+        }
+
+        User currentUser = securityservice.getCurrentUser();
+
+        if (!parkingService.existsByUserCreatorIdAndId(currentUser.getId(), parkingEmployee.getParkingId())) {
+            if (!parkingEmployeeService.existsByUserIdAndParkingId(currentUser.getId(), parkingEmployee.getParkingId())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else {
+                EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);
+                if (employeePermissions == null || !employeePermissions.isCanAddEmployee()) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+            }
+        }
+
+        EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);
+        if (employeePermissions == null) {
+            employeePermissions = new EmployeePermissions();
+            employeePermissions.setEmployeeId(parkingEmployee.getId());
+        }
+
+        employeePermissions.setCanCheckinVehicle(requestUpdateEmployeePermissionsDTO.isCanCheckinVehicle());
+        employeePermissions.setCanCheckoutVehicle(requestUpdateEmployeePermissionsDTO.isCanCheckoutVehicle());
+        employeePermissions.setCanAddEmployee(requestUpdateEmployeePermissionsDTO.isCanAddEmployee());
+        employeePermissions.setCanEditParking(requestUpdateEmployeePermissionsDTO.isCanEditParking());
+        employeePermissions.setUpdatedAt(LocalDateTime.now());
+        employeePermissions.setUpdateUserId(currentUser.getId());
+        employeePermissionsService.save(employeePermissions);
+
+        return ResponseEntity.ok().build();
     }
 }
