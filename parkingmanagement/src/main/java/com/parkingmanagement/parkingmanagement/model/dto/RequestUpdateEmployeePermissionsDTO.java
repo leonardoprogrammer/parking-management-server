@@ -1,8 +1,6 @@
 package com.parkingmanagement.parkingmanagement.model.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.UUID;
 
 public class RequestUpdateEmployeePermissionsDTO {
 

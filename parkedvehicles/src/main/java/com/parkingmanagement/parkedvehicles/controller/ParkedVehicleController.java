@@ -3,6 +3,7 @@ package com.parkingmanagement.parkedvehicles.controller;
 import com.parkingmanagement.parkedvehicles.model.dto.RequestCheckinParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.dto.RequestCheckoutParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.dto.ResponseCheckinParkedVehicleDTO;
+import com.parkingmanagement.parkedvehicles.model.dto.ResponseFullParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
 import com.parkingmanagement.parkedvehicles.model.entity.User;
 import com.parkingmanagement.parkedvehicles.security.SecurityService;
@@ -37,9 +38,9 @@ public class ParkedVehicleController {
         this.userService = userService;
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Object> getById(@PathVariable UUID id) {
-        ParkedVehicle parkedVehicle = parkedVehicleService.findById(id).orElse(null);
+    @GetMapping("{parkedVehicleId}")
+    public ResponseEntity<Object> getById(@PathVariable UUID parkedVehicleId) {
+        ParkedVehicle parkedVehicle = parkedVehicleService.findById(parkedVehicleId).orElse(null);
         if (parkedVehicle == null) {
             return ResponseEntity.notFound().build();
         }
@@ -48,7 +49,28 @@ public class ParkedVehicleController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(parkedVehicle);
+        User checkinEmployeeUser = userService.findById(parkedVehicle.getCheckinEmployeeId()).orElse(null);
+        User checkoutEmployeeUser = parkedVehicle.getCheckoutEmployeeId() != null ? userService.findById(parkedVehicle.getCheckoutEmployeeId()).orElse(null) : null;
+
+        ResponseFullParkedVehicleDTO responseFullParkedVehicleDTO = new ResponseFullParkedVehicleDTO(
+                parkedVehicle.getId(),
+                parkedVehicle.getParkingId(),
+                parkedVehicle.getPlate(),
+                parkedVehicle.getModel(),
+                parkedVehicle.getColor(),
+                parkedVehicle.getSpace(),
+                parkedVehicle.getEntryDate(),
+                checkinEmployeeUser.getId(),
+                checkinEmployeeUser.getName(),
+                parkedVehicle.getCheckoutDate(),
+                checkoutEmployeeUser != null ? checkoutEmployeeUser.getId() : null,
+                checkoutEmployeeUser != null ? checkoutEmployeeUser.getName() : null,
+                parkedVehicle.isPaid(),
+                parkedVehicle.getPaymentMethod(),
+                parkedVehicle.getCreatedAt()
+        );
+
+        return ResponseEntity.ok(responseFullParkedVehicleDTO);
     }
 
     @GetMapping("/{id}/checkin")

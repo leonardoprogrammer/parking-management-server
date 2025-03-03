@@ -47,6 +47,7 @@ public class ParkedVehicleService {
 
     private ResponseHistoryParkedVehicleDTO convertToResponseHistoryParkedVehicleDTO(ParkedVehicle parkedVehicle) {
         return new ResponseHistoryParkedVehicleDTO(
+                parkedVehicle.getId(),
                 parkedVehicle.getPlate(),
                 parkedVehicle.getModel(),
                 parkedVehicle.getColor(),

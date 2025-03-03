@@ -1,9 +1,11 @@
 package com.parkingmanagement.parkedvehicles.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class ResponseHistoryParkedVehicleDTO {
 
+    private UUID parkedVehicleId;
     private String plate;
     private String model;
     private String color;
@@ -11,13 +13,22 @@ public class ResponseHistoryParkedVehicleDTO {
     private LocalDateTime createdAt;
     private boolean checkedOut;
 
-    public ResponseHistoryParkedVehicleDTO(String plate, String model, String color, LocalDateTime entryDate, LocalDateTime createdAt, boolean checkedOut) {
+    public ResponseHistoryParkedVehicleDTO(UUID parkedVehicleId, String plate, String model, String color, LocalDateTime entryDate, LocalDateTime createdAt, boolean checkedOut) {
+        this.parkedVehicleId = parkedVehicleId;
         this.plate = plate;
         this.model = model;
         this.color = color;
         this.entryDate = entryDate;
         this.createdAt = createdAt;
         this.checkedOut = checkedOut;
+    }
+
+    public UUID getParkedVehicleId() {
+        return parkedVehicleId;
+    }
+
+    public void setParkedVehicleId(UUID parkedVehicleId) {
+        this.parkedVehicleId = parkedVehicleId;
     }
 
     public String getPlate() {
