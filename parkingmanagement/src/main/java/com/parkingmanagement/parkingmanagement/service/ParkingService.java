@@ -4,6 +4,7 @@ import com.parkingmanagement.parkingmanagement.model.entity.Parking;
 import com.parkingmanagement.parkingmanagement.model.entity.ParkingEmployee;
 import com.parkingmanagement.parkingmanagement.repository.ParkingRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,5 +63,10 @@ public class ParkingService {
 
     public boolean existsByUserCreatorIdAndId(UUID userId, UUID parkingId) {
         return parkingRepository.existsByUserCreatorIdAndId(userId, parkingId);
+    }
+
+    @Transactional
+    public void deleteById(UUID id) {
+        parkingRepository.deleteById(id);
     }
 }

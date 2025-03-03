@@ -17,25 +17,23 @@ public class EmployeePermissions {
     private UUID employeeId;
 
     @Column(nullable = false)
-    private boolean checkinVehicle;
+    private boolean canCheckinVehicle;
 
     @Column(nullable = false)
-    private boolean checkoutVehicle;
+    private boolean canCheckoutVehicle;
 
     @Column(nullable = false)
-    private boolean addEmployee;
+    private boolean canAddEmployee;
 
     @Column(nullable = false)
-    private boolean changePermissions;
-
-    @Column(nullable = false)
-    private boolean editParking;
+    private boolean canEditParking;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private UUID updateUser;
+    private LocalDateTime updatedAt;
+
+    private UUID updateUserId;
 
     public EmployeePermissions() {
     }
@@ -56,44 +54,36 @@ public class EmployeePermissions {
         this.employeeId = employeeId;
     }
 
-    public boolean isCheckinVehicle() {
-        return checkinVehicle;
+    public boolean isCanCheckinVehicle() {
+        return canCheckinVehicle;
     }
 
-    public void setCheckinVehicle(boolean checkinVehicle) {
-        this.checkinVehicle = checkinVehicle;
+    public void setCanCheckinVehicle(boolean canCheckinVehicle) {
+        this.canCheckinVehicle = canCheckinVehicle;
     }
 
-    public boolean isCheckoutVehicle() {
-        return checkoutVehicle;
+    public boolean isCanCheckoutVehicle() {
+        return canCheckoutVehicle;
     }
 
-    public void setCheckoutVehicle(boolean checkoutVehicle) {
-        this.checkoutVehicle = checkoutVehicle;
+    public void setCanCheckoutVehicle(boolean canCheckoutVehicle) {
+        this.canCheckoutVehicle = canCheckoutVehicle;
     }
 
-    public boolean isAddEmployee() {
-        return addEmployee;
+    public boolean isCanAddEmployee() {
+        return canAddEmployee;
     }
 
-    public void setAddEmployee(boolean addEmployee) {
-        this.addEmployee = addEmployee;
+    public void setCanAddEmployee(boolean canAddEmployee) {
+        this.canAddEmployee = canAddEmployee;
     }
 
-    public boolean isChangePermissions() {
-        return changePermissions;
+    public boolean isCanEditParking() {
+        return canEditParking;
     }
 
-    public void setChangePermissions(boolean changePermissions) {
-        this.changePermissions = changePermissions;
-    }
-
-    public boolean isEditParking() {
-        return editParking;
-    }
-
-    public void setEditParking(boolean editParking) {
-        this.editParking = editParking;
+    public void setCanEditParking(boolean canEditParking) {
+        this.canEditParking = canEditParking;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -104,11 +94,19 @@ public class EmployeePermissions {
         this.createdAt = createdAt;
     }
 
-    public UUID getUpdateUser() {
-        return updateUser;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdateUser(UUID updateUser) {
-        this.updateUser = updateUser;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public UUID getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(UUID updateUserId) {
+        this.updateUserId = updateUserId;
     }
 }

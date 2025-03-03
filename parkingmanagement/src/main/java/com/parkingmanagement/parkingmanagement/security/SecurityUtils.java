@@ -3,7 +3,7 @@ package com.parkingmanagement.parkingmanagement.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public class SecuritytUtils {
+public class SecurityUtils {
 
     public static boolean isCurrentUser(String email) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

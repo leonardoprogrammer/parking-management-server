@@ -21,13 +21,17 @@ public class SecurityService {
         this.parkingEmployeeService = parkingEmployeeService;
     }
 
-    public boolean userIsOwnerOrEmployee(String userEmail, UUID parkingId) {
-        User user = userService.findByEmail(userEmail).orElse(null);
+    public boolean userIsOwnerOrEmployee(UUID parkingId) {
+        User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
         if (user == null) {
             return false;
         }
 
         return parkingService.existsByUserCreatorIdAndId(user.getId(), parkingId)
                 || parkingEmployeeService.existsByUserIdAndParkingId(user.getId(), parkingId);
+    }
+
+    public User getCurrentUser() {
+        return userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
     }
 }

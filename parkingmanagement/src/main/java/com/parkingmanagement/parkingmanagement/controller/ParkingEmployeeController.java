@@ -1,11 +1,14 @@
 package com.parkingmanagement.parkingmanagement.controller;
 
+import com.parkingmanagement.parkingmanagement.model.dto.ResponseDetailsEmployeeDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.BasicEmployeeDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.ResponseListEmployeesDTO;
 import com.parkingmanagement.parkingmanagement.model.entity.EmployeePermissions;
 import com.parkingmanagement.parkingmanagement.model.entity.Parking;
 import com.parkingmanagement.parkingmanagement.model.entity.ParkingEmployee;
 import com.parkingmanagement.parkingmanagement.model.entity.User;
 import com.parkingmanagement.parkingmanagement.security.SecurityService;
-import com.parkingmanagement.parkingmanagement.security.SecuritytUtils;
+import com.parkingmanagement.parkingmanagement.security.SecurityUtils;
 import com.parkingmanagement.parkingmanagement.service.EmployeePermissionsService;
 import com.parkingmanagement.parkingmanagement.service.ParkingEmployeeService;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,26 +46,80 @@ public class ParkingEmployeeController {
             return ResponseEntity.notFound().build();
         }
 
-        if (!securityService.userIsOwnerOrEmployee(SecuritytUtils.getCurrentUserEmail(), parkingEmployee.getParkingId())) {
+        if (!securityService.userIsOwnerOrEmployee(parkingEmployee.getParkingId())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(parkingEmployee);
+        User employeeUser = userService.findById(parkingEmployee.getParkingId()).orElse(null);
+        User adderUser = userService.findById(parkingEmployee.getAdderUserId()).orElse(null);
+
+        User userToken = securityService.getCurrentUser();
+
+        boolean isOwner = parkingService.existsByUserCreatorIdAndId(userToken.getId(), parkingEmployee.getParkingId());
+        boolean seeDetails;
+
+        if (isOwner) {
+            seeDetails = true;
+        } else {
+            ParkingEmployee parkingEmployeeToken = parkingEmployeeService.findByParkingIdAndUserId(parkingEmployee.getParkingId(), userToken.getId()).orElse(null);
+            EmployeePermissions employeePermissionsToken = employeePermissionsService.findByEmployeeId(parkingEmployeeToken.getId()).orElse(null);
+            seeDetails = employeePermissionsToken.isCanAddEmployee();
+        }
+
+        EmployeePermissions employeePermissions = seeDetails ? employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null) : null;
+
+        ResponseDetailsEmployeeDTO responseDetailsEmployeeDTO = new ResponseDetailsEmployeeDTO(
+                parkingEmployee.getId(),
+                parkingEmployee.getParkingId(),
+                parkingEmployee.getUserId(),
+                employeeUser.getName(),
+                seeDetails ? employeeUser.getCpf() : null,
+                seeDetails ? employeeUser.getEmail() : null,
+                seeDetails ? employeeUser.getTelephone() : null,
+                adderUser.getName(),
+                parkingEmployee.getCreatedAt(),
+                employeePermissions
+        );
+
+        return ResponseEntity.ok(responseDetailsEmployeeDTO);
     }
 
     @GetMapping("/parking/{id}")
-    public ResponseEntity<List<ParkingEmployee>> getEmployeesByParkingId(@PathVariable UUID parkingId) {
+    public ResponseEntity<Object> getEmployeesByParkingId(@PathVariable UUID parkingId) {
+        Parking parking = parkingService.findById(parkingId).orElse(null);
+        if (parking == null) {
+            return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
+        }
+
+        if (!securityService.userIsOwnerOrEmployee(parkingId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         List<ParkingEmployee> employees = parkingEmployeeService.findEmployeesByParkingId(parkingId);
 
         if (employees.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        if (!securityService.userIsOwnerOrEmployee(SecuritytUtils.getCurrentUserEmail(), parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        List<BasicEmployeeDTO> basicEmployeeDTOS = new ArrayList<>();
+        for (ParkingEmployee employee : employees) {
+            User userEmployee = userService.findById(employee.getUserId()).orElse(null);
+
+            BasicEmployeeDTO basicEmployeeDTO = new BasicEmployeeDTO(
+                    employee.getId(),
+                    userEmployee.getName()
+            );
+            basicEmployeeDTOS.add(basicEmployeeDTO);
         }
 
-        return ResponseEntity.ok(employees);
+        User owner = userService.findById(parking.getUserCreatorId()).orElse(null);
+
+        ResponseListEmployeesDTO responseListEmployeesDTO = new ResponseListEmployeesDTO(
+                owner.getName(),
+                basicEmployeeDTOS
+        );
+
+        return ResponseEntity.ok(responseListEmployeesDTO);
     }
 
     @PostMapping
@@ -77,20 +135,20 @@ public class ParkingEmployeeController {
             return ResponseEntity.badRequest().body("Não há usuário com este ID");
         }
 
-        User userToken = userService.findByEmail(SecuritytUtils.getCurrentUserEmail()).orElse(null);
+        User userToken = securityService.getCurrentUser();
         if (!parking.getUserCreatorId().equals(userToken.getId())) {
             ParkingEmployee parkingEmployee = parkingEmployeeService.findByParkingIdAndUserId(parkingId, userToken.getId()).orElse(null);
             if (parkingEmployee == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             } else {
                 EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);
-                if (employeePermissions == null || !employeePermissions.isAddEmployee()) {
+                if (employeePermissions == null || !employeePermissions.isCanAddEmployee()) {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
                 }
             }
         }
 
-        ParkingEmployee parkingEmployee = new ParkingEmployee(parkingId, userId, userToken.getName());
+        ParkingEmployee parkingEmployee = new ParkingEmployee(parkingId, userId, userToken.getId());
         ParkingEmployee newParkingEmployee = parkingEmployeeService.save(parkingEmployee);
 
         return ResponseEntity.ok(newParkingEmployee);
@@ -103,7 +161,7 @@ public class ParkingEmployeeController {
             return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
         }
 
-        if (!SecuritytUtils.isCurrentUser(user.getEmail())) {
+        if (!SecurityUtils.isCurrentUser(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -126,7 +184,7 @@ public class ParkingEmployeeController {
 
         Parking parking = parkingService.findById(parkingEmployee.getParkingId()).orElse(null);
         User user = userService.findById(parking.getUserCreatorId()).orElse(null);
-        if (!SecuritytUtils.isCurrentUser(user.getEmail())) {
+        if (!SecurityUtils.isCurrentUser(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

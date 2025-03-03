@@ -4,6 +4,7 @@ import com.parkingmanagement.parkingmanagement.model.entity.ParkingEmployee;
 import com.parkingmanagement.parkingmanagement.repository.ParkingEmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,7 @@ public class ParkingEmployeeService {
         return parkingEmployeeRepository.save(parkingEmployee);
     }
 
+    @Transactional
     public void deleteById(UUID id) {
         parkingEmployeeRepository.deleteById(id);
     }

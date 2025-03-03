@@ -1,9 +1,9 @@
 package com.parkingmanagement.parkingmanagement.controller;
 
-import com.parkingmanagement.parkingmanagement.model.dto.ParkingDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.RequestParkingDTO;
 import com.parkingmanagement.parkingmanagement.model.entity.Parking;
 import com.parkingmanagement.parkingmanagement.model.entity.User;
-import com.parkingmanagement.parkingmanagement.security.SecuritytUtils;
+import com.parkingmanagement.parkingmanagement.security.SecurityUtils;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
 import com.parkingmanagement.parkingmanagement.service.UserService;
 import jakarta.validation.Valid;
@@ -47,14 +47,14 @@ public class ParkingController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> register(@Valid @RequestBody ParkingDTO parkingDTO) {
-        UUID userCreatorid = UUID.fromString(parkingDTO.getUserCreatorId());
+    public ResponseEntity<Object> register(@Valid @RequestBody RequestParkingDTO requestParkingDTO) {
+        UUID userCreatorid = UUID.fromString(requestParkingDTO.getUserCreatorId());
 
         if (!userService.existsById(userCreatorid)) {
             return ResponseEntity.badRequest().body("Não há usuário com este ID");
         }
 
-        Parking newParking = new Parking(userCreatorid, parkingDTO.getName(), parkingDTO.getAddress());
+        Parking newParking = new Parking(userCreatorid, requestParkingDTO.getName(), requestParkingDTO.getAddress());
 
         Parking savedParking = parkingService.save(newParking);
 
@@ -70,12 +70,12 @@ public class ParkingController {
         }
 
         User user = userService.findById(parking.getUserCreatorId()).orElse(null);
-        if (!SecuritytUtils.isCurrentUser(user.getEmail())) {
+        if (!SecurityUtils.isCurrentUser(user.getEmail())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         parkingService.delete(id);
 
-        return ResponseEntity.ok("Estacionamento apagado");
+        return ResponseEntity.ok().build();
     }
 }

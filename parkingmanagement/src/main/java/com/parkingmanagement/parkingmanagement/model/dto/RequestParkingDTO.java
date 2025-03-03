@@ -3,7 +3,7 @@ package com.parkingmanagement.parkingmanagement.model.dto;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.UUID;
 
-public class ParkingDTO {
+public class RequestParkingDTO {
 
     @NotBlank(message = "'userCreatorId' é obrigatório")
     @UUID(message = "'userCreatorId' é inválido")

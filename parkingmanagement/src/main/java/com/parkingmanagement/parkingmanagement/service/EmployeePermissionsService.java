@@ -3,6 +3,7 @@ package com.parkingmanagement.parkingmanagement.service;
 import com.parkingmanagement.parkingmanagement.model.entity.EmployeePermissions;
 import com.parkingmanagement.parkingmanagement.repository.EmployeePermissionsRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +33,7 @@ public class EmployeePermissionsService {
         employeePermissionsRepository.deleteById(id);
     }
 
+    @Transactional
     public void deleteByEmployeeId(UUID employeeId) {
         employeePermissionsRepository.deleteByEmployeeId(employeeId);
     }

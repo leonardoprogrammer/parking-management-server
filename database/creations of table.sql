@@ -34,22 +34,20 @@ CREATE TABLE parking_employee (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    adder_user_name VARCHAR(255) NOT NULL,
+    adder_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP
 );
 
 CREATE TABLE employee_permissions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	employee_id UUID NOT NULL REFERENCES parking_employee(id) ON DELETE CASCADE,
-    checkin_vehicle BOOLEAN NOT NULL,
-    checkout_vehicle BOOLEAN NOT NULL,
-    add_employee BOOLEAN NOT NULL,
-    change_permissions BOOLEAN NOT NULL,
-    edit_parking BOOLEAN NOT NULL,
-    date_inc TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_at TIMESTAMP,
-    updateUser UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    can_checkin_vehicle BOOLEAN NOT NULL,
+    can_checkout_vehicle BOOLEAN NOT NULL,
+    can_add_employee BOOLEAN NOT NULL,
+    can_edit_parking BOOLEAN NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+	updated_at TIMESTAMP,
+    updateUserId UUID REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE parked_vehicle (
