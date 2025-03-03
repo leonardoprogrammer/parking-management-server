@@ -18,10 +18,6 @@ public class RequestUpdateEmployeePermissionsDTO {
     @NotNull(message = "'canEditParking' é obrigatório")
     private boolean canEditParking;
 
-    @NotBlank(message = "'updateUserId' é obrigatório")
-    @UUID(message = "updateUserId é inválido")
-    private String updateUserId;
-
     public RequestUpdateEmployeePermissionsDTO() {
     }
 
@@ -55,13 +51,5 @@ public class RequestUpdateEmployeePermissionsDTO {
 
     public void setCanEditParking(boolean canEditParking) {
         this.canEditParking = canEditParking;
-    }
-
-    public String getUpdateUserId() {
-        return updateUserId;
-    }
-
-    public void setUpdateUserId(String updateUserId) {
-        this.updateUserId = updateUserId;
     }
 }

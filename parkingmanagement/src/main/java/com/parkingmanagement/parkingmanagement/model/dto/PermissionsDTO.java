@@ -4,16 +4,16 @@ public class PermissionsDTO {
 
     private boolean canCheckinVehicle;
     private boolean canCheckoutVehicle;
-    private boolean canAddEmploye;
+    private boolean canAddEmployee;
     private boolean canEditParking;
 
     public PermissionsDTO() {
     }
 
-    public PermissionsDTO(boolean canCheckinVehicle, boolean canCheckoutVehicle, boolean canAddEmploye, boolean canEditParking) {
+    public PermissionsDTO(boolean canCheckinVehicle, boolean canCheckoutVehicle, boolean canAddEmployee, boolean canEditParking) {
         this.canCheckinVehicle = canCheckinVehicle;
         this.canCheckoutVehicle = canCheckoutVehicle;
-        this.canAddEmploye = canAddEmploye;
+        this.canAddEmployee = canAddEmployee;
         this.canEditParking = canEditParking;
     }
 
@@ -33,12 +33,12 @@ public class PermissionsDTO {
         this.canCheckoutVehicle = canCheckoutVehicle;
     }
 
-    public boolean isCanAddEmploye() {
-        return canAddEmploye;
+    public boolean isCanAddEmployee() {
+        return canAddEmployee;
     }
 
-    public void setCanAddEmploye(boolean canAddEmploye) {
-        this.canAddEmploye = canAddEmploye;
+    public void setCanAddEmployee(boolean canAddEmployee) {
+        this.canAddEmployee = canAddEmployee;
     }
 
     public boolean isCanEditParking() {

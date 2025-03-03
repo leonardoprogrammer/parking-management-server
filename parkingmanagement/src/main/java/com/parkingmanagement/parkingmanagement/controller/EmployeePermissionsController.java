@@ -87,8 +87,9 @@ public class EmployeePermissionsController {
             if (!parkingEmployeeService.existsByUserIdAndParkingId(currentUser.getId(), parkingEmployee.getParkingId())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             } else {
-                EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);
-                if (employeePermissions == null || !employeePermissions.isCanAddEmployee()) {
+                ParkingEmployee currentEmployee = parkingEmployeeService.findByParkingIdAndUserId(parkingEmployee.getParkingId(), currentUser.getId()).orElse(null);
+                EmployeePermissions currentEmployeePermissions = employeePermissionsService.findByEmployeeId(currentEmployee.getId()).orElse(null);
+                if (currentEmployeePermissions == null || !currentEmployeePermissions.isCanAddEmployee()) {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
                 }
             }

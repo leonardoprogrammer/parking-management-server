@@ -50,7 +50,7 @@ public class ParkingEmployeeController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User employeeUser = userService.findById(parkingEmployee.getParkingId()).orElse(null);
+        User employeeUser = userService.findById(parkingEmployee.getUserId()).orElse(null);
         User adderUser = userService.findById(parkingEmployee.getAdderUserId()).orElse(null);
 
         User userToken = securityService.getCurrentUser();
@@ -84,7 +84,7 @@ public class ParkingEmployeeController {
         return ResponseEntity.ok(responseDetailsEmployeeDTO);
     }
 
-    @GetMapping("/parking/{id}")
+    @GetMapping("/parking/{parkingId}")
     public ResponseEntity<Object> getEmployeesByParkingId(@PathVariable UUID parkingId) {
         Parking parking = parkingService.findById(parkingId).orElse(null);
         if (parking == null) {

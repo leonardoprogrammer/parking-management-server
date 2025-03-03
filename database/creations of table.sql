@@ -35,7 +35,7 @@ CREATE TABLE parking_employee (
 	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     adder_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE employee_permissions (
@@ -47,7 +47,7 @@ CREATE TABLE employee_permissions (
     can_edit_parking BOOLEAN NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMP,
-    updateUserId UUID REFERENCES users(id) ON DELETE CASCADE
+    update_user_id UUID REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE parked_vehicle (
