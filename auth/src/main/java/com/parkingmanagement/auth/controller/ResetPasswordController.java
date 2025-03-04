@@ -1,6 +1,6 @@
 package com.parkingmanagement.auth.controller;
 
-import com.parkingmanagement.auth.model.dto.ResetPasswordDTO;
+import com.parkingmanagement.auth.model.dto.RequestResetPasswordDTO;
 import com.parkingmanagement.auth.model.entity.ResetPassword;
 import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.service.EmailService;
@@ -69,8 +69,8 @@ public class ResetPasswordController {
     }
 
     @PostMapping
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
-        ResetPassword resetPassword = resetPasswordService.findByIdAndEmail(UUID.fromString(resetPasswordDTO.getId()), resetPasswordDTO.getEmail()).orElse(null);
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody RequestResetPasswordDTO requestResetPasswordDTO) {
+        ResetPassword resetPassword = resetPasswordService.findByIdAndEmail(UUID.fromString(requestResetPasswordDTO.getId()), requestResetPasswordDTO.getEmail()).orElse(null);
 
         if (resetPassword == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solicitação de redefinição de senha não encontrada");
@@ -82,8 +82,8 @@ public class ResetPasswordController {
             return ResponseEntity.badRequest().body("Solicitação de redefinição de senha expirada");
         }
 
-        User user = userService.findByEmail(resetPasswordDTO.getEmail()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
+        User user = userService.findByEmail(requestResetPasswordDTO.getEmail()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        user.setPassword(passwordEncoder.encode(requestResetPasswordDTO.getNewPassword()));
         userService.save(user);
 
         resetPassword.setReset(true);

@@ -1,6 +1,6 @@
 package com.parkingmanagement.auth.controller;
 
-import com.parkingmanagement.auth.model.dto.UserDTO;
+import com.parkingmanagement.auth.model.dto.RequestUserDTO;
 import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.security.JwtService;
 import com.parkingmanagement.auth.service.UserService;
@@ -44,25 +44,20 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody UserDTO userDTO) {
-        if (userService.existsByEmail(userDTO.getEmail())) {
+    public ResponseEntity<User> register(@Valid @RequestBody RequestUserDTO requestUserDTO) {
+        if (userService.existsByEmail(requestUserDTO.getEmail())) {
             return ResponseEntity.badRequest().build();
         }
-        if (userService.existsByCpf(userDTO.getCpf())) {
+        if (userService.existsByCpf(requestUserDTO.getCpf())) {
             return ResponseEntity.badRequest().build();
         }
 
         User newUser = new User();
-        BeanUtils.copyProperties(userDTO, newUser);
-        newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        BeanUtils.copyProperties(requestUserDTO, newUser);
+        newUser.setPassword(passwordEncoder.encode(requestUserDTO.getPassword()));
 
         User savedUser = userService.save(newUser);
 
         return ResponseEntity.ok(savedUser);
-    }
-
-    @PostMapping("/passwordEncoder")
-    public ResponseEntity<String> passwordEncoderTest(@RequestBody String password) {
-        return ResponseEntity.ok(passwordEncoder.encode(password));
     }
 }

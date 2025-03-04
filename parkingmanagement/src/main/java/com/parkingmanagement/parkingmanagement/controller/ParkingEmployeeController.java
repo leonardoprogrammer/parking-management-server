@@ -1,8 +1,6 @@
 package com.parkingmanagement.parkingmanagement.controller;
 
-import com.parkingmanagement.parkingmanagement.model.dto.ResponseDetailsEmployeeDTO;
-import com.parkingmanagement.parkingmanagement.model.dto.BasicEmployeeDTO;
-import com.parkingmanagement.parkingmanagement.model.dto.ResponseListEmployeesDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.*;
 import com.parkingmanagement.parkingmanagement.model.entity.EmployeePermissions;
 import com.parkingmanagement.parkingmanagement.model.entity.Parking;
 import com.parkingmanagement.parkingmanagement.model.entity.ParkingEmployee;
@@ -63,7 +61,7 @@ public class ParkingEmployeeController {
         } else {
             ParkingEmployee parkingEmployeeToken = parkingEmployeeService.findByParkingIdAndUserId(parkingEmployee.getParkingId(), userToken.getId()).orElse(null);
             EmployeePermissions employeePermissionsToken = employeePermissionsService.findByEmployeeId(parkingEmployeeToken.getId()).orElse(null);
-            seeDetails = employeePermissionsToken.isCanAddEmployee();
+            seeDetails = employeePermissionsToken == null ? false : employeePermissionsToken.isCanAddEmployee();
         }
 
         EmployeePermissions employeePermissions = seeDetails ? employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null) : null;
@@ -148,10 +146,19 @@ public class ParkingEmployeeController {
             }
         }
 
-        ParkingEmployee parkingEmployee = new ParkingEmployee(parkingId, userId, userToken.getId());
-        ParkingEmployee newParkingEmployee = parkingEmployeeService.save(parkingEmployee);
+        ParkingEmployee newParkingEmployee = new ParkingEmployee(parkingId, userId, userToken.getId());
+        ParkingEmployee savedParkingEmployee = parkingEmployeeService.save(newParkingEmployee);
 
-        return ResponseEntity.ok(newParkingEmployee);
+        EmployeePermissions newEmployeePermissions = new EmployeePermissions(
+                savedParkingEmployee.getId(),
+                false,
+                false,
+                false,
+                false
+        );
+        employeePermissionsService.save(newEmployeePermissions);
+
+        return ResponseEntity.ok(savedParkingEmployee);
     }
 
     @PostMapping("/leave")
@@ -175,21 +182,31 @@ public class ParkingEmployeeController {
         return ResponseEntity.ok("Usuário removido do estacionamento");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable UUID id) {
-        ParkingEmployee parkingEmployee = parkingEmployeeService.findById(id).orElse(null);
+    @DeleteMapping("/{parkingEmployeeId}")
+    public ResponseEntity<Object> delete(@PathVariable UUID parkingEmployeeId) {
+        ParkingEmployee parkingEmployee = parkingEmployeeService.findById(parkingEmployeeId).orElse(null);
         if (parkingEmployee == null) {
             return ResponseEntity.badRequest().body("Não há funcionário com este ID");
         }
 
         Parking parking = parkingService.findById(parkingEmployee.getParkingId()).orElse(null);
-        User user = userService.findById(parking.getUserCreatorId()).orElse(null);
-        if (!SecurityUtils.isCurrentUser(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        User currentUser = securityService.getCurrentUser();
+
+        if (parking == null || !parking.getUserCreatorId().equals(currentUser.getId())) {
+            ParkingEmployee currentUserEmployee = parkingEmployeeService.findByParkingIdAndUserId(parking.getId(), currentUser.getId()).orElse(null);
+            if (currentUserEmployee == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } else {
+                EmployeePermissions currentEmployeePermissions = employeePermissionsService.findByEmployeeId(currentUserEmployee.getId()).orElse(null);
+                if (currentEmployeePermissions == null || !currentEmployeePermissions.isCanAddEmployee()) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+            }
         }
 
-        parkingEmployeeService.deleteById(id);
+        employeePermissionsService.deleteByEmployeeId(parkingEmployeeId);
+        parkingEmployeeService.deleteById(parkingEmployeeId);
 
-        return ResponseEntity.ok("Funcionário removido do estacionamento");
+        return ResponseEntity.ok().build();
     }
 }

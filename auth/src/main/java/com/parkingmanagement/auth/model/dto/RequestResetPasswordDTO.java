@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.UUID;
 
-public class ResetPasswordDTO {
+public class RequestResetPasswordDTO {
 
     @NotBlank(message = "Informe 'email'")
     private String email;

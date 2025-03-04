@@ -2,7 +2,7 @@ package com.parkingmanagement.parkingmanagement.model.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public class RequestUpdateEmployeePermissionsDTO {
+public class RequestEmployeePermissionsDTO {
 
     @NotNull(message = "'canCheckinVehicle' é obrigatório")
     private boolean canCheckinVehicle;
@@ -16,7 +16,7 @@ public class RequestUpdateEmployeePermissionsDTO {
     @NotNull(message = "'canEditParking' é obrigatório")
     private boolean canEditParking;
 
-    public RequestUpdateEmployeePermissionsDTO() {
+    public RequestEmployeePermissionsDTO() {
     }
 
     public boolean isCanCheckinVehicle() {

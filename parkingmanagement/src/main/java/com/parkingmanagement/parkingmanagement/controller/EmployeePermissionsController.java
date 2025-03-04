@@ -1,7 +1,7 @@
 package com.parkingmanagement.parkingmanagement.controller;
 
 import com.parkingmanagement.parkingmanagement.model.dto.PermissionsDTO;
-import com.parkingmanagement.parkingmanagement.model.dto.RequestUpdateEmployeePermissionsDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.RequestEmployeePermissionsDTO;
 import com.parkingmanagement.parkingmanagement.model.entity.EmployeePermissions;
 import com.parkingmanagement.parkingmanagement.model.entity.Parking;
 import com.parkingmanagement.parkingmanagement.model.entity.ParkingEmployee;
@@ -62,19 +62,28 @@ public class EmployeePermissionsController {
         } else {
             ParkingEmployee parkingEmployee = parkingEmployeeService.findByParkingIdAndUserId(parkingId, currentUser.getId()).orElse(null);
             EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);
-            permissionsDTO = new PermissionsDTO(
-                    employeePermissions.isCanCheckinVehicle(),
-                    employeePermissions.isCanCheckoutVehicle(),
-                    employeePermissions.isCanAddEmployee(),
-                    employeePermissions.isCanEditParking()
-            );
+            if (employeePermissions != null) {
+                permissionsDTO = new PermissionsDTO(
+                        employeePermissions.isCanCheckinVehicle(),
+                        employeePermissions.isCanCheckoutVehicle(),
+                        employeePermissions.isCanAddEmployee(),
+                        employeePermissions.isCanEditParking()
+                );
+            } else {
+                permissionsDTO = new PermissionsDTO(
+                        false,
+                        false,
+                        false,
+                        false
+                );
+            }
         }
 
         return ResponseEntity.ok(permissionsDTO);
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateEmployeePermissions(@Valid @RequestBody RequestUpdateEmployeePermissionsDTO requestUpdateEmployeePermissionsDTO,
+    public ResponseEntity<Object> updateEmployeePermissions(@Valid @RequestBody RequestEmployeePermissionsDTO requestEmployeePermissionsDTO,
                                                             @RequestParam UUID employeeId) {
         ParkingEmployee parkingEmployee = parkingEmployeeService.findById(employeeId).orElse(null);
         if (parkingEmployee == null) {
@@ -101,10 +110,10 @@ public class EmployeePermissionsController {
             employeePermissions.setEmployeeId(parkingEmployee.getId());
         }
 
-        employeePermissions.setCanCheckinVehicle(requestUpdateEmployeePermissionsDTO.isCanCheckinVehicle());
-        employeePermissions.setCanCheckoutVehicle(requestUpdateEmployeePermissionsDTO.isCanCheckoutVehicle());
-        employeePermissions.setCanAddEmployee(requestUpdateEmployeePermissionsDTO.isCanAddEmployee());
-        employeePermissions.setCanEditParking(requestUpdateEmployeePermissionsDTO.isCanEditParking());
+        employeePermissions.setCanCheckinVehicle(requestEmployeePermissionsDTO.isCanCheckinVehicle());
+        employeePermissions.setCanCheckoutVehicle(requestEmployeePermissionsDTO.isCanCheckoutVehicle());
+        employeePermissions.setCanAddEmployee(requestEmployeePermissionsDTO.isCanAddEmployee());
+        employeePermissions.setCanEditParking(requestEmployeePermissionsDTO.isCanEditParking());
         employeePermissions.setUpdatedAt(LocalDateTime.now());
         employeePermissions.setUpdateUserId(currentUser.getId());
         employeePermissionsService.save(employeePermissions);

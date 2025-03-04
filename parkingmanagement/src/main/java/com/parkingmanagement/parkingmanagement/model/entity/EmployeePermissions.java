@@ -38,6 +38,14 @@ public class EmployeePermissions {
     public EmployeePermissions() {
     }
 
+    public EmployeePermissions(UUID employeeId, boolean canCheckinVehicle, boolean canCheckoutVehicle, boolean canAddEmployee, boolean canEditParking) {
+        this.employeeId = employeeId;
+        this.canCheckinVehicle = canCheckinVehicle;
+        this.canCheckoutVehicle = canCheckoutVehicle;
+        this.canAddEmployee = canAddEmployee;
+        this.canEditParking = canEditParking;
+    }
+
     public UUID getId() {
         return id;
     }

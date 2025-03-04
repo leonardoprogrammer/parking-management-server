@@ -51,6 +51,10 @@ public class UserService implements UserDetailsService {
         return user != null ? user.getId() : null;
     }
 
+    public List<User> searchUsers(String name, String email, String cpf) {
+        return userRepository.searchUsers(name, email, cpf);
+    }
+
     public boolean existsByCpf(String cpf) {
         return userRepository.existsByCpf(cpf);
     }

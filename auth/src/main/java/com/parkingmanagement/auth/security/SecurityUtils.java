@@ -10,4 +10,9 @@ public class SecurityUtils {
         String currentUserEmail = authentication.getName();
         return currentUserEmail.equals(email);
     }
+
+    public static String getCurrentUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
 }
