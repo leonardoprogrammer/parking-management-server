@@ -138,9 +138,33 @@ public class UserController {
 
         user.setPassword(passwordEncoder.encode(requestChangePasswordDTO.getNewPassword()));
         user.setUpdatedAt(LocalDateTime.now());
-        userService.save(user);
+        User savedUser = userService.save(user);
 
-        String newToken = jwtService.generateToken(userService.loadUserByUsername(user.getEmail()));
+        String newToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
+
+        return ResponseEntity.ok(Map.of("token", newToken));
+    }
+
+    @PutMapping("/changeCurrentUserEmail")
+    public ResponseEntity<Object> changeCurrentUserEmail(@Valid @RequestBody RequestChangeEmailDTO requestChangeEmailDTO) {
+        User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (requestChangeEmailDTO.getNewEmail().equals(user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        if (userService.existsByEmail(requestChangeEmailDTO.getNewEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        user.setEmail(requestChangeEmailDTO.getNewEmail());
+        user.setUpdatedAt(LocalDateTime.now());
+        User savedUser = userService.save(user);
+
+        String newToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
 
         return ResponseEntity.ok(Map.of("token", newToken));
     }
