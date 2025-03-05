@@ -11,6 +11,7 @@ import com.parkingmanagement.parkingmanagement.service.EmployeePermissionsServic
 import com.parkingmanagement.parkingmanagement.service.ParkingEmployeeService;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
 import com.parkingmanagement.parkingmanagement.service.UserService;
+import com.parkingmanagement.parkingmanagement.utils.Utils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,9 +72,9 @@ public class ParkingEmployeeController {
                 parkingEmployee.getParkingId(),
                 parkingEmployee.getUserId(),
                 employeeUser.getName(),
-                seeDetails ? employeeUser.getCpf() : null,
-                seeDetails ? employeeUser.getEmail() : null,
-                seeDetails ? employeeUser.getTelephone() : null,
+                Utils.maskCpf(employeeUser.getCpf()),
+                Utils.maskEmail(employeeUser.getEmail()),
+                Utils.maskPhone(employeeUser.getTelephone()),
                 adderUser.getName(),
                 parkingEmployee.getCreatedAt(),
                 employeePermissions

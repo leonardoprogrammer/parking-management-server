@@ -5,9 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.br.CPF;
 
-public class RequestUserDTO {
+public class RequestRegisterUserDTO {
 
     @NotBlank(message = "'name' é obrigatório")
+    @Size(min = 3, message = "'name' deve ter no mínimo 3 caracteres")
     private String name;
 
     @NotBlank(message = "'cpf' é obrigatório")
@@ -19,7 +20,7 @@ public class RequestUserDTO {
     @Email(message = "'email' é inválido")
     private String email;
 
-    @Size(max = 20, message = "'telephone' deve ter no máximo 20 caracteres")
+    @Size(min = 11, max = 11, message = "'telephone' deve ter 11 caracteres")
     private String telephone;
 
     @Size(min = 6, message = "'password' deve ter no mínimo 6 caracteres")

@@ -1,19 +1,24 @@
 package com.parkingmanagement.auth.controller;
 
-import com.parkingmanagement.auth.model.dto.ResponseSearchUserDTO;
+import com.parkingmanagement.auth.model.dto.*;
 import com.parkingmanagement.auth.model.entity.Parking;
 import com.parkingmanagement.auth.model.entity.User;
+import com.parkingmanagement.auth.security.JwtService;
 import com.parkingmanagement.auth.security.SecurityUtils;
 import com.parkingmanagement.auth.service.ParkingEmployeeService;
 import com.parkingmanagement.auth.service.ParkingService;
 import com.parkingmanagement.auth.service.UserService;
 import com.parkingmanagement.auth.utils.Utils;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,23 +28,36 @@ public class UserController {
     private final UserService userService;
     private final ParkingService parkingService;
     private final ParkingEmployeeService parkingEmployeeService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UserController(UserService userService, ParkingService parkingService, ParkingEmployeeService parkingEmployeeService) {
+    public UserController(UserService userService, ParkingService parkingService, ParkingEmployeeService parkingEmployeeService, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userService = userService;
         this.parkingService = parkingService;
         this.parkingEmployeeService = parkingEmployeeService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable UUID id) {
-        User user = userService.findById(id)
-                            .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o id: " + id));
+    @GetMapping("/currentUser")
+    public ResponseEntity<Object> getCurrentUser() {
+        User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
 
-        if (!SecurityUtils.isCurrentUser(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (user == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(user);
+        ResponseUserDTO responseUserDTO = new ResponseUserDTO(
+                user.getId(),
+                user.getName(),
+                Utils.maskCpf(user.getCpf()),
+                user.getEmail(),
+                Utils.maskPhone(user.getTelephone()),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+
+        return ResponseEntity.ok(responseUserDTO);
     }
 
     @GetMapping("/search")
@@ -77,8 +95,8 @@ public class UserController {
 
         List<ResponseSearchUserDTO> responseSearchUserDTOS = new ArrayList<>();
         for (User user : users) {
-            String protectedEmail = Utils.maskEmail(user.getEmail());
-            String protectCpf = Utils.maskCpf(user.getCpf());
+            String protectedEmail = Utils.maskProtectedEmail(user.getEmail());
+            String protectCpf = Utils.maskProtectedCpf(user.getCpf());
             ResponseSearchUserDTO responseSearchUserDTO = new ResponseSearchUserDTO(
                     user.getId(),
                     user.getName(),
@@ -89,5 +107,41 @@ public class UserController {
         }
 
         return ResponseEntity.ok(responseSearchUserDTOS);
+    }
+
+    @PutMapping("/currentUser")
+    public ResponseEntity<Object> updateCurrentUser(@Valid @RequestBody RequestUpdateUserDTO requestUpdateUserDTO) {
+        User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        user.setName(requestUpdateUserDTO.getName());
+        user.setTelephone(requestUpdateUserDTO.getTelephone());
+        user.setUpdatedAt(LocalDateTime.now());
+        userService.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/changeCurrentUserPassword")
+    public ResponseEntity<Object> changeCurrentUserPassword(@Valid @RequestBody RequestChangePasswordDTO requestChangePasswordDTO) {
+        User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!passwordEncoder.matches(requestChangePasswordDTO.getCurrentPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
+
+        user.setPassword(passwordEncoder.encode(requestChangePasswordDTO.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userService.save(user);
+
+        String newToken = jwtService.generateToken(userService.loadUserByUsername(user.getEmail()));
+
+        return ResponseEntity.ok(Map.of("token", newToken));
     }
 }

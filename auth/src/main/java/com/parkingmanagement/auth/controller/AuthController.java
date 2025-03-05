@@ -1,6 +1,6 @@
 package com.parkingmanagement.auth.controller;
 
-import com.parkingmanagement.auth.model.dto.RequestUserDTO;
+import com.parkingmanagement.auth.model.dto.RequestRegisterUserDTO;
 import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.security.JwtService;
 import com.parkingmanagement.auth.service.UserService;
@@ -44,17 +44,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody RequestUserDTO requestUserDTO) {
-        if (userService.existsByEmail(requestUserDTO.getEmail())) {
+    public ResponseEntity<User> register(@Valid @RequestBody RequestRegisterUserDTO requestRegisterUserDTO) {
+        if (userService.existsByEmail(requestRegisterUserDTO.getEmail())) {
             return ResponseEntity.badRequest().build();
         }
-        if (userService.existsByCpf(requestUserDTO.getCpf())) {
+        if (userService.existsByCpf(requestRegisterUserDTO.getCpf())) {
             return ResponseEntity.badRequest().build();
         }
 
         User newUser = new User();
-        BeanUtils.copyProperties(requestUserDTO, newUser);
-        newUser.setPassword(passwordEncoder.encode(requestUserDTO.getPassword()));
+        BeanUtils.copyProperties(requestRegisterUserDTO, newUser);
+        newUser.setPassword(passwordEncoder.encode(requestRegisterUserDTO.getPassword()));
 
         User savedUser = userService.save(newUser);
 

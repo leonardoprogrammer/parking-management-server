@@ -1,8 +1,10 @@
-package com.parkingmanagement.auth.utils;
+package com.parkingmanagement.parkingmanagement.utils;
 
 public class Utils {
 
-    public static String maskProtectedEmail(String email) {
+    public static String maskEmail(String email) {
+        if (email == null) return null;
+
         int atIndex = email.indexOf("@");
         if (atIndex > 3) {
             return email.substring(0, 3) + "******" + email.substring(atIndex);
@@ -10,7 +12,9 @@ public class Utils {
         return email;
     }
 
-    public static String maskProtectedCpf(String cpf) {
+    public static String maskCpf(String cpf) {
+        if (cpf == null) return null;
+
         if (cpf.length() == 11) {
             return cpf.substring(0, 3) + ".***.***-" + cpf.substring(9);
         } else if (cpf.length() > 3) {
@@ -20,13 +24,6 @@ public class Utils {
                 maskedCpf.append("*");
             }
             return maskedCpf.toString();
-        }
-        return cpf;
-    }
-
-    public static String maskCpf(String cpf) {
-        if (cpf.length() == 11) {
-            return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9);
         }
         return cpf;
     }
