@@ -2,6 +2,7 @@ package com.parkingmanagement.parkingmanagement.model.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -40,6 +41,9 @@ public class ParkedVehicle {
 
     @Column(nullable = false)
     private Boolean paid;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amountPaid;
 
     @Column(length = 50)
     private String paymentMethod;
@@ -138,6 +142,14 @@ public class ParkedVehicle {
 
     public void setPaid(Boolean paid) {
         this.paid = paid;
+    }
+
+    public BigDecimal getAmountPaid() {
+        return amountPaid;
+    }
+
+    public void setAmountPaid(BigDecimal amountPaid) {
+        this.amountPaid = amountPaid;
     }
 
     public String getPaymentMethod() {

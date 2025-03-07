@@ -1,9 +1,9 @@
 package com.parkingmanagement.parkingmanagement.controller;
 
-import com.parkingmanagement.parkingmanagement.model.dto.RequestParkingDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.RequestRegisterParkingDTO;
+import com.parkingmanagement.parkingmanagement.model.dto.RequestUpdateParkingDTO;
 import com.parkingmanagement.parkingmanagement.model.entity.Parking;
-import com.parkingmanagement.parkingmanagement.model.entity.User;
-import com.parkingmanagement.parkingmanagement.security.SecurityUtils;
+import com.parkingmanagement.parkingmanagement.security.SecurityService;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
 import com.parkingmanagement.parkingmanagement.service.UserService;
 import jakarta.validation.Valid;
@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -19,17 +20,26 @@ public class ParkingController {
 
     private final ParkingService parkingService;
     private final UserService userService;
+    private final SecurityService securityService;
 
-    public ParkingController(ParkingService parkingService, UserService userService) {
+    public ParkingController(ParkingService parkingService, UserService userService, SecurityService securityService) {
         this.parkingService = parkingService;
         this.userService = userService;
+        this.securityService = securityService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Parking> getById(@PathVariable UUID id) {
-        return parkingService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/{parkingId}")
+    public ResponseEntity<Object> getById(@PathVariable UUID parkingId) {
+        Parking parking = parkingService.findById(parkingId).orElse(null);
+        if (parking == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!securityService.currentUserIsOwnerOrEmployee(parkingId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(parking);
     }
 
     @GetMapping("/user/{userId}")
@@ -47,34 +57,52 @@ public class ParkingController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> register(@Valid @RequestBody RequestParkingDTO requestParkingDTO) {
-        UUID userCreatorid = UUID.fromString(requestParkingDTO.getUserCreatorId());
+    public ResponseEntity<Object> register(@Valid @RequestBody RequestRegisterParkingDTO requestRegisterParkingDTO) {
+        UUID userCreatorid = UUID.fromString(requestRegisterParkingDTO.getUserCreatorId());
 
         if (!userService.existsById(userCreatorid)) {
             return ResponseEntity.badRequest().body("Não há usuário com este ID");
         }
 
-        Parking newParking = new Parking(userCreatorid, requestParkingDTO.getName(), requestParkingDTO.getAddress());
+        Parking newParking = new Parking(userCreatorid, requestRegisterParkingDTO.getName(), requestRegisterParkingDTO.getAddress());
 
         Parking savedParking = parkingService.save(newParking);
 
         return ResponseEntity.ok(savedParking);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable UUID id) {
-        Parking parking = parkingService.findById(id).orElse(null);
+    @PutMapping("/{parkingId}")
+    public ResponseEntity<Object> update(@PathVariable UUID parkingId, @Valid @RequestBody RequestUpdateParkingDTO requestUpdateParkingDTO) {
+        Parking parking = parkingService.findById(parkingId).orElse(null);
+        if (parking == null) {
+            return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
+        }
+
+        if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        parking.setName(requestUpdateParkingDTO.getParkingName());
+        parking.setAddress(requestUpdateParkingDTO.getParkingAddress());
+        parking.setUpdatedAt(LocalDateTime.now());
+        parkingService.save(parking);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{parkingId}")
+    public ResponseEntity<Object> delete(@PathVariable UUID parkingId) {
+        Parking parking = parkingService.findById(parkingId).orElse(null);
 
         if (parking == null) {
             return ResponseEntity.badRequest().body("Não há estacionamento com este ID");
         }
 
-        User user = userService.findById(parking.getUserCreatorId()).orElse(null);
-        if (!SecurityUtils.isCurrentUser(user.getEmail())) {
+        if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        parkingService.delete(id);
+        parkingService.delete(parkingId);
 
         return ResponseEntity.ok().build();
     }
