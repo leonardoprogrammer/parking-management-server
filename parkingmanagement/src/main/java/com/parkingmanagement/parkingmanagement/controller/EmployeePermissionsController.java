@@ -46,7 +46,7 @@ public class EmployeePermissionsController {
             return ResponseEntity.badRequest().body("Usuário não encontrado");
         }
 
-        if (!securityservice.userIsOwnerOrEmployee(parkingId)) {
+        if (!securityservice.currentUserIsOwnerOrEmployee(parkingId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -92,16 +92,9 @@ public class EmployeePermissionsController {
 
         User currentUser = securityservice.getCurrentUser();
 
-        if (!parkingService.existsByUserCreatorIdAndId(currentUser.getId(), parkingEmployee.getParkingId())) {
-            if (!parkingEmployeeService.existsByUserIdAndParkingId(currentUser.getId(), parkingEmployee.getParkingId())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } else {
-                ParkingEmployee currentEmployee = parkingEmployeeService.findByParkingIdAndUserId(parkingEmployee.getParkingId(), currentUser.getId()).orElse(null);
-                EmployeePermissions currentEmployeePermissions = employeePermissionsService.findByEmployeeId(currentEmployee.getId()).orElse(null);
-                if (currentEmployeePermissions == null || !currentEmployeePermissions.isCanAddEmployee()) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                }
-            }
+        if (!securityservice.currentUserIsOwner(parkingEmployee.getParkingId())
+                && !securityservice.currentUserIsEmployeeAndCanAddEmployee(parkingEmployee.getParkingId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);
