@@ -30,6 +30,15 @@ CREATE TABLE parking (
     updated_at TIMESTAMP
 );
 
+CREATE table parking_settings (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
+	charge_from_check_in BOOLEAN NOT NULL,
+	minimum_time_to_charge TIME,
+	period TIME NOT NULL,
+	value_per_period NUMERIC(10,2) NOT NULL
+);
+
 CREATE TABLE parking_employee (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	parking_id UUID NOT NULL REFERENCES parking(id) ON DELETE CASCADE,
@@ -62,6 +71,7 @@ CREATE TABLE parked_vehicle (
     checkout_date TIMESTAMP,
     checkout_employee_id UUID REFERENCES users(id) ON DELETE SET NULL,
     paid BOOLEAN NOT NULL,
+	amount_paid NUMERIC(10,2),
     payment_method VARCHAR(50),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP

@@ -1,5 +1,6 @@
 package com.parkingmanagement.parkedvehicles.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,16 +12,18 @@ public class ResponseCheckinParkedVehicleDTO {
     private String color;
     private String space;
     private LocalDateTime entryDate;
+    private BigDecimal amountToPay;
     private String checkinEmployeeName;
     private LocalDateTime checkinDate;
 
-    public ResponseCheckinParkedVehicleDTO(UUID parkingId, String plate, String model, String color, String space, LocalDateTime entryDate, String checkinEmployeeName, LocalDateTime checkinDate) {
+    public ResponseCheckinParkedVehicleDTO(UUID parkingId, String plate, String model, String color, String space, LocalDateTime entryDate, BigDecimal amountToPay, String checkinEmployeeName, LocalDateTime checkinDate) {
         this.parkingId = parkingId;
         this.plate = plate;
         this.model = model;
         this.color = color;
         this.space = space;
         this.entryDate = entryDate;
+        this.amountToPay = amountToPay;
         this.checkinEmployeeName = checkinEmployeeName;
         this.checkinDate = checkinDate;
     }
@@ -71,6 +74,14 @@ public class ResponseCheckinParkedVehicleDTO {
 
     public void setEntryDate(LocalDateTime entryDate) {
         this.entryDate = entryDate;
+    }
+
+    public BigDecimal getAmountToPay() {
+        return amountToPay;
+    }
+
+    public void setAmountToPay(BigDecimal amountToPay) {
+        this.amountToPay = amountToPay;
     }
 
     public String getCheckinEmployeeName() {

@@ -5,17 +5,17 @@ import com.parkingmanagement.parkedvehicles.model.dto.RequestCheckoutParkedVehic
 import com.parkingmanagement.parkedvehicles.model.dto.ResponseCheckinParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.dto.ResponseFullParkedVehicleDTO;
 import com.parkingmanagement.parkedvehicles.model.entity.ParkedVehicle;
+import com.parkingmanagement.parkedvehicles.model.entity.ParkingSettings;
 import com.parkingmanagement.parkedvehicles.model.entity.User;
 import com.parkingmanagement.parkedvehicles.security.SecurityService;
 import com.parkingmanagement.parkedvehicles.security.SecurityUtils;
-import com.parkingmanagement.parkedvehicles.service.ParkedVehicleService;
-import com.parkingmanagement.parkedvehicles.service.ParkingService;
-import com.parkingmanagement.parkedvehicles.service.UserService;
+import com.parkingmanagement.parkedvehicles.service.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -30,15 +30,19 @@ public class ParkedVehicleController {
     private final SecurityService securityService;
     private final ParkingService parkingService;
     private final UserService userService;
+    private final ParkingSettingsService parkingSettingsService;
+    private final ParkingFeeCalculatorService parkingFeeCalculatorService;
 
-    public ParkedVehicleController(ParkedVehicleService parkedVehicleService, SecurityService securityService, ParkingService parkingService, UserService userService) {
+    public ParkedVehicleController(ParkedVehicleService parkedVehicleService, SecurityService securityService, ParkingService parkingService, UserService userService, ParkingSettingsService parkingSettingsService, ParkingFeeCalculatorService parkingFeeCalculatorService) {
         this.parkedVehicleService = parkedVehicleService;
         this.securityService = securityService;
         this.parkingService = parkingService;
         this.userService = userService;
+        this.parkingSettingsService = parkingSettingsService;
+        this.parkingFeeCalculatorService = parkingFeeCalculatorService;
     }
 
-    @GetMapping("{parkedVehicleId}")
+    @GetMapping("/{parkedVehicleId}")
     public ResponseEntity<Object> getById(@PathVariable UUID parkedVehicleId) {
         ParkedVehicle parkedVehicle = parkedVehicleService.findById(parkedVehicleId).orElse(null);
         if (parkedVehicle == null) {
@@ -86,6 +90,9 @@ public class ParkedVehicleController {
 
         User userEmployee = userService.findById(parkedVehicle.getCheckinEmployeeId()).orElse(null);
 
+        ParkingSettings parkingSettings = parkingSettingsService.findByParkingId(parkedVehicle.getParkingId()).orElse(null);
+        BigDecimal amountToPay = parkingSettings != null ? parkingFeeCalculatorService.calculatorFee(parkingSettings, parkedVehicle.getEntryDate(), LocalDateTime.now()) : null;
+
         ResponseCheckinParkedVehicleDTO responseCheckinParkedVehicleDTO = new ResponseCheckinParkedVehicleDTO(
                 parkedVehicle.getParkingId(),
                 parkedVehicle.getPlate(),
@@ -93,6 +100,7 @@ public class ParkedVehicleController {
                 parkedVehicle.getColor(),
                 parkedVehicle.getSpace(),
                 parkedVehicle.getEntryDate(),
+                amountToPay,
                 userEmployee.getName(),
                 parkedVehicle.getCreatedAt()
         );

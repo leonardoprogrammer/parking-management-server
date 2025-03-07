@@ -17,12 +17,14 @@ public class ParkingService {
     private final ParkingRepository parkingRepository;
     private final ParkedVehicleService parkedVehicleService;
     private final ParkingEmployeeService parkingEmployeeService;
+    private final ParkingSettingsService parkingSettingsService;
     private final EmployeePermissionsService employeePermissionsService;
 
-    public ParkingService(ParkingRepository parkingRepository, ParkedVehicleService parkedVehicleService, ParkingEmployeeService parkingEmployeeService, EmployeePermissionsService employeePermissionsService) {
+    public ParkingService(ParkingRepository parkingRepository, ParkedVehicleService parkedVehicleService, ParkingEmployeeService parkingEmployeeService, ParkingSettingsService parkingSettingsService, EmployeePermissionsService employeePermissionsService) {
         this.parkingRepository = parkingRepository;
         this.parkedVehicleService = parkedVehicleService;
         this.parkingEmployeeService = parkingEmployeeService;
+        this.parkingSettingsService = parkingSettingsService;
         this.employeePermissionsService = employeePermissionsService;
     }
 
@@ -49,16 +51,18 @@ public class ParkingService {
                 .collect(Collectors.toList());
     }
 
-    public void delete(UUID id) {
-        parkedVehicleService.deleteByParkingId(id);
+    public void delete(UUID parkingId) {
+        parkedVehicleService.deleteByParkingId(parkingId);
 
-        List<ParkingEmployee> employees = parkingEmployeeService.findEmployeesByParkingId(id);
+        List<ParkingEmployee> employees = parkingEmployeeService.findEmployeesByParkingId(parkingId);
         for (ParkingEmployee employee : employees) {
             employeePermissionsService.deleteByEmployeeId(employee.getId());
             parkingEmployeeService.deleteById(employee.getId());
         }
 
-        parkingRepository.deleteById(id);
+        parkingSettingsService.deleteByParkingId(parkingId);
+
+        parkingRepository.deleteById(parkingId);
     }
 
     public boolean existsByUserCreatorIdAndId(UUID userId, UUID parkingId) {
