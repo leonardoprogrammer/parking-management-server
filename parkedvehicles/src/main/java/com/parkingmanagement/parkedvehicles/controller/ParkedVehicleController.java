@@ -10,6 +10,7 @@ import com.parkingmanagement.parkedvehicles.model.entity.User;
 import com.parkingmanagement.parkedvehicles.security.SecurityService;
 import com.parkingmanagement.parkedvehicles.security.SecurityUtils;
 import com.parkingmanagement.parkedvehicles.service.*;
+import com.parkingmanagement.parkedvehicles.utils.Utils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,7 @@ public class ParkedVehicleController {
                 checkoutEmployeeUser != null ? checkoutEmployeeUser.getId() : null,
                 checkoutEmployeeUser != null ? checkoutEmployeeUser.getName() : null,
                 parkedVehicle.isPaid(),
+                Utils.formatToBRL(parkedVehicle.getAmountPaid()),
                 parkedVehicle.getPaymentMethod(),
                 parkedVehicle.getCreatedAt()
         );
@@ -211,12 +213,16 @@ public class ParkedVehicleController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = userService.findById(checkoutEmployeeId).orElse(null);
-        if (user == null) {
+        if (parkedVehicle.getCheckoutDate() != null) {
+            return ResponseEntity.badRequest().body("Já há checkout deste veículo");
+        }
+
+        User checkoutUser = userService.findById(checkoutEmployeeId).orElse(null);
+        if (checkoutUser == null) {
             return ResponseEntity.badRequest().body("Não há usuário com este ID");
         }
 
-        if (!securityService.userIsOwnerOrEmployee(user.getEmail(), parkedVehicle.getParkingId())) {
+        if (!securityService.userIsOwnerOrEmployee(checkoutUser.getEmail(), parkedVehicle.getParkingId())) {
             return ResponseEntity.badRequest().body("O usuário não é funcionário deste estacionamento");
         }
 
@@ -232,6 +238,14 @@ public class ParkedVehicleController {
             return ResponseEntity.badRequest().body("A data de saída não pode ser menor que a data de entrada");
         }
 
+        if (requestCheckoutParkedVehicleDTO.isPaid() && requestCheckoutParkedVehicleDTO.getAmountPaid() == null) {
+            return ResponseEntity.badRequest().body("O valor pago é obrigatório quando o pagamento é efetuado");
+        }
+
+        if (requestCheckoutParkedVehicleDTO.getAmountPaid() != null && !requestCheckoutParkedVehicleDTO.isPaid()) {
+            return ResponseEntity.badRequest().body("O pagamento não foi efetuado, mas um valor foi informado");
+        }
+
         if (requestCheckoutParkedVehicleDTO.isPaid()
                 && (requestCheckoutParkedVehicleDTO.getPaymentMethod() == null || requestCheckoutParkedVehicleDTO.getPaymentMethod().isBlank())) {
             return ResponseEntity.badRequest().body("O método de pagamento é obrigatório quando o pagamento é efetuado");
@@ -245,6 +259,7 @@ public class ParkedVehicleController {
         parkedVehicle.setCheckoutDate(checkoutDate);
         parkedVehicle.setCheckoutEmployeeId(checkoutEmployeeId);
         parkedVehicle.setPaid(requestCheckoutParkedVehicleDTO.isPaid());
+        parkedVehicle.setAmountPaid(requestCheckoutParkedVehicleDTO.getAmountPaid());
         parkedVehicle.setPaymentMethod(requestCheckoutParkedVehicleDTO.getPaymentMethod());
         parkedVehicle.setUpdatedAt(LocalDateTime.now());
         parkedVehicleService.save(parkedVehicle);

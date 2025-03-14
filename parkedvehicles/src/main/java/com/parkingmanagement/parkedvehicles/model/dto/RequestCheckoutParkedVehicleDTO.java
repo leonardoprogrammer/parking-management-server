@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.UUID;
 
+import java.math.BigDecimal;
+
 public class RequestCheckoutParkedVehicleDTO {
 
     @NotBlank(message = "'parkedVehicleId' é obrigatório")
@@ -19,6 +21,8 @@ public class RequestCheckoutParkedVehicleDTO {
 
     @NotNull(message = "'paid' é obrigatório")
     private boolean paid;
+
+    private BigDecimal amountPaid;
 
     private String paymentMethod;
 
@@ -52,6 +56,14 @@ public class RequestCheckoutParkedVehicleDTO {
 
     public void setPaid(boolean paid) {
         this.paid = paid;
+    }
+
+    public BigDecimal getAmountPaid() {
+        return amountPaid;
+    }
+
+    public void setAmountPaid(BigDecimal amountPaid) {
+        this.amountPaid = amountPaid;
     }
 
     public String getPaymentMethod() {
