@@ -134,7 +134,7 @@ public class ParkingEmployeeController {
             return ResponseEntity.badRequest().body("Não há usuário com este ID");
         }
 
-        if (!securityService.currentUserIsOwner(parkingId) || !securityService.currentUserIsEmployeeAndCanAddEmployee(parkingId)) {
+        if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanAddEmployee(parkingId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -183,8 +183,8 @@ public class ParkingEmployeeController {
 
         Parking parking = parkingService.findById(parkingEmployee.getParkingId()).orElse(null);
 
-        if (parking == null || !securityService.currentUserIsOwner(parking.getId())
-                || !securityService.currentUserIsEmployeeAndCanAddEmployee(parking.getId())) {
+        if (parking == null || (!securityService.currentUserIsOwner(parking.getId())
+                && !securityService.currentUserIsEmployeeAndCanAddEmployee(parking.getId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
