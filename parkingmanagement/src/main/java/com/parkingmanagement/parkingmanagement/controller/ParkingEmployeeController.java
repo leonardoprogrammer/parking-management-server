@@ -46,7 +46,7 @@ public class ParkingEmployeeController {
         }
 
         if (!securityService.currentUserIsOwnerOrEmployee(parkingEmployee.getParkingId())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         User employeeUser = userService.findById(parkingEmployee.getUserId()).orElse(null);
@@ -91,7 +91,7 @@ public class ParkingEmployeeController {
         }
 
         if (!securityService.currentUserIsOwnerOrEmployee(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         List<ParkingEmployee> employees = parkingEmployeeService.findEmployeesByParkingId(parkingId);
@@ -135,7 +135,7 @@ public class ParkingEmployeeController {
         }
 
         if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanAddEmployee(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         ParkingEmployee newParkingEmployee = new ParkingEmployee(parkingId, userId, securityService.getCurrentUser().getId());
@@ -161,7 +161,7 @@ public class ParkingEmployeeController {
         }
 
         if (!SecurityUtils.isCurrentUser(user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         ParkingEmployee parkingEmployee = parkingEmployeeService.findByParkingIdAndUserId(parkingId, userId).orElse(null);
@@ -185,7 +185,7 @@ public class ParkingEmployeeController {
 
         if (parking == null || (!securityService.currentUserIsOwner(parking.getId())
                 && !securityService.currentUserIsEmployeeAndCanAddEmployee(parking.getId()))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         employeePermissionsService.deleteByEmployeeId(parkingEmployeeId);

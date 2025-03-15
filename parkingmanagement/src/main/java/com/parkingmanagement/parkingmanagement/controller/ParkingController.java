@@ -36,7 +36,7 @@ public class ParkingController {
         }
 
         if (!securityService.currentUserIsOwnerOrEmployee(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(parking);
@@ -79,7 +79,7 @@ public class ParkingController {
         }
 
         if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         parking.setName(requestUpdateParkingDTO.getParkingName());
@@ -99,7 +99,7 @@ public class ParkingController {
         }
 
         if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         parkingService.delete(parkingId);

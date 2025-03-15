@@ -47,7 +47,7 @@ public class EmployeePermissionsController {
         }
 
         if (!securityservice.currentUserIsOwnerOrEmployee(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         PermissionsDTO permissionsDTO;
@@ -94,7 +94,7 @@ public class EmployeePermissionsController {
 
         if (!securityservice.currentUserIsOwner(parkingEmployee.getParkingId())
                 && !securityservice.currentUserIsEmployeeAndCanAddEmployee(parkingEmployee.getParkingId())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         EmployeePermissions employeePermissions = employeePermissionsService.findByEmployeeId(parkingEmployee.getId()).orElse(null);

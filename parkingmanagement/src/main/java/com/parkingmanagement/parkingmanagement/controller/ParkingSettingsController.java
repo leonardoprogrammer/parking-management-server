@@ -36,7 +36,7 @@ public class ParkingSettingsController {
         }
 
         if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(parkingSettings);
@@ -50,7 +50,7 @@ public class ParkingSettingsController {
         }
 
         if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         ParkingSettings parkingSettings = parkingSettingsService.findByParkingId(parkingId).orElse(null);
@@ -79,7 +79,7 @@ public class ParkingSettingsController {
         }
 
         if (!securityService.currentUserIsOwner(parkingId) && !securityService.currentUserIsEmployeeAndCanEditParking(parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         if (!requestUpdateParkingSettingsDTO.isChargeFromCheckIn() && requestUpdateParkingSettingsDTO.getMinimumTimeToCharge() == null) {

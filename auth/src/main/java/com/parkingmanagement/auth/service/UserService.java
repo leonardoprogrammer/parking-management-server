@@ -29,7 +29,7 @@ public class UserService implements UserDetailsService {
                 .map(user -> org.springframework.security.core.userdetails.User
                         .withUsername(user.getEmail())
                         .password(user.getPassword())
-                        .authorities(List.of()) // Replace with actual roles/authorities if available
+                        .authorities(List.of())
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o e-mail: " + email));
     }

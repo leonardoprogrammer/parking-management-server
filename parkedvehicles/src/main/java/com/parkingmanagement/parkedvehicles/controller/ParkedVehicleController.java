@@ -51,7 +51,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkedVehicle.getParkingId())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         User checkinEmployeeUser = userService.findById(parkedVehicle.getCheckinEmployeeId()).orElse(null);
@@ -87,7 +87,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkedVehicle.getParkingId())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         User userEmployee = userService.findById(parkedVehicle.getCheckinEmployeeId()).orElse(null);
@@ -119,7 +119,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(parkedVehicles);
@@ -132,7 +132,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(parkedVehicleService.getParkedVehiclesHistoryByParkingId(parkingId, page, sizePage));
@@ -145,7 +145,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.ok(parkedVehicleService.getTotalPagesOfParkedVehiclesHistory(parkingId, sizePage));
@@ -169,7 +169,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkingId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         User user = userService.findById(userEmployeeId).orElse(null);
@@ -210,7 +210,7 @@ public class ParkedVehicleController {
         }
 
         if (!securityService.userIsOwnerOrEmployee(SecurityUtils.getCurrentUserEmail(), parkedVehicle.getParkingId())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         if (parkedVehicle.getCheckoutDate() != null) {
