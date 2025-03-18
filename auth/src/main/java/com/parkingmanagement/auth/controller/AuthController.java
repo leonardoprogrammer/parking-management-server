@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,10 +38,12 @@ public class AuthController {
         String password = request.get("password");
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        String token = jwtService.authenticate(email, password);
+        String accessToken = jwtService.authenticate(email, password);
         UUID userId = userService.getUserIdByEmail(email);
+        UserDetails userDetails = userService.loadUserByUsername(email);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        return ResponseEntity.ok(Map.of("token", token, "userId", userId.toString()));
+        return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken, "userId", userId.toString()));
     }
 
     @PostMapping("/register")
@@ -59,5 +62,13 @@ public class AuthController {
         User savedUser = userService.save(newUser);
 
         return ResponseEntity.ok(savedUser);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        String newAccessToken = jwtService.refreshAccessToken(refreshToken);
+        String newRefreshToken = jwtService.generateRefreshToken(userService.loadUserByUsername(jwtService.extractUsername(refreshToken)));
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 }

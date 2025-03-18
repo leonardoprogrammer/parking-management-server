@@ -140,9 +140,9 @@ public class UserController {
         user.setUpdatedAt(LocalDateTime.now());
         User savedUser = userService.save(user);
 
-        String newToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
+        String newAccessToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
 
-        return ResponseEntity.ok(Map.of("token", newToken));
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 
     @PutMapping("/changeCurrentUserEmail")
@@ -164,8 +164,8 @@ public class UserController {
         user.setUpdatedAt(LocalDateTime.now());
         User savedUser = userService.save(user);
 
-        String newToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
+        String newAccessToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
 
-        return ResponseEntity.ok(Map.of("token", newToken));
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 }

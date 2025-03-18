@@ -45,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userEmail = jwtService.extractUsername(token);
         } catch (ExpiredJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token expirado.");
             return;
         }
 
