@@ -79,9 +79,9 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(responseFullParkedVehicleDTO);
     }
 
-    @GetMapping("/{id}/checkin")
-    public ResponseEntity<Object> getCheckinParkedVehicleById(@PathVariable UUID id) {
-        ParkedVehicle parkedVehicle = parkedVehicleService.findById(id).orElse(null);
+    @GetMapping("/{parkedVehicleId}/checkin")
+    public ResponseEntity<Object> getCheckinParkedVehicleById(@PathVariable UUID parkedVehicleId) {
+        ParkedVehicle parkedVehicle = parkedVehicleService.findById(parkedVehicleId).orElse(null);
         if (parkedVehicle == null) {
             return ResponseEntity.notFound().build();
         }
@@ -187,10 +187,10 @@ public class ParkedVehicleController {
 
         ParkedVehicle newParkedVehicle = new ParkedVehicle(
                 parkingId,
-                requestCheckinParkedVehicleDTO.getPlate(),
-                requestCheckinParkedVehicleDTO.getModel(),
-                requestCheckinParkedVehicleDTO.getColor(),
-                requestCheckinParkedVehicleDTO.getSpace(),
+                requestCheckinParkedVehicleDTO.getPlate().toUpperCase(),
+                requestCheckinParkedVehicleDTO.getModel().toUpperCase(),
+                requestCheckinParkedVehicleDTO.getColor().toUpperCase(),
+                !requestCheckinParkedVehicleDTO.getSpace().isBlank() ? requestCheckinParkedVehicleDTO.getSpace().toUpperCase() : null,
                 entryDate,
                 userEmployeeId
         );

@@ -17,6 +17,7 @@ public class RequestCheckinParkedVehicleDTO {
     @NotBlank(message = "'model' é obrigatório")
     private String model;
 
+    @NotBlank
     @Size(max = 50, message = "'color' deve ter no máximo 50 caracteres")
     private String color;
 
