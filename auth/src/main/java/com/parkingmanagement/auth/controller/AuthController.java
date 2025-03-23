@@ -69,6 +69,6 @@ public class AuthController {
         String refreshToken = request.get("refreshToken");
         String newAccessToken = jwtService.refreshAccessToken(refreshToken);
         String newRefreshToken = jwtService.generateRefreshToken(userService.loadUserByUsername(jwtService.extractUsername(refreshToken)));
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken));
     }
 }

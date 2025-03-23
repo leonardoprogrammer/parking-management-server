@@ -90,11 +90,9 @@ public class JwtService {
         if (validateRefreshToken(refreshToken)) {
             String username = extractUsername(refreshToken);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            String newRefreshToken = generateRefreshToken(userDetails);
-            refreshTokenStore.put(username, newRefreshToken);
             return generateToken(userDetails);
         } else {
-            throw new BadCredentialsException("Invalid Refresh Token");
+            throw new BadCredentialsException("Refresh Token inválido");
         }
     }
 
