@@ -141,8 +141,9 @@ public class UserController {
         User savedUser = userService.save(user);
 
         String newAccessToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
+        String newRefreshToken = jwtService.generateRefreshToken(userService.loadUserByUsername(savedUser.getEmail()));
 
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        return ResponseEntity.ok(Map.of("newAccessToken", newAccessToken, "newRefreshToken", newRefreshToken));
     }
 
     @PutMapping("/changeCurrentUserEmail")
@@ -165,7 +166,8 @@ public class UserController {
         User savedUser = userService.save(user);
 
         String newAccessToken = jwtService.generateToken(userService.loadUserByUsername(savedUser.getEmail()));
+        String newRefreshToken = jwtService.generateRefreshToken(userService.loadUserByUsername(savedUser.getEmail()));
 
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        return ResponseEntity.ok(Map.of("newAccessToken", newAccessToken, "newRefreshToken", newRefreshToken));
     }
 }
