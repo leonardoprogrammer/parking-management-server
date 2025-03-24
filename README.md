@@ -1,6 +1,6 @@
-# Parking Management System - Backend
+# Parking Management Server
 
-O **Parking Management System - Backend** é o coração do projeto de gerenciamento de estacionamentos, implementado como um conjunto de **microsserviços**. Este repositório abrange a lógica de negócio e integrações essenciais para o funcionamento completo do sistema, como autenticação, gerenciamento de estacionamentos, controle de veículos, notificações e muito mais.
+O **Parking Management Server** é o coração do projeto de gerenciamento de estacionamentos, implementado como um conjunto de **microsserviços**. Este repositório abrange a lógica de negócio e integrações essenciais para o funcionamento completo do sistema, como autenticação, gerenciamento de estacionamentos, controle de veículos, notificações e muito mais.
 
 🔗 **Repositório GitHub:** [Parking Management Server](https://github.com/leonardoprogrammer/parking-management-server)
 
@@ -77,6 +77,7 @@ docker-compose up -d
 ```
 
 4. **Acesse a documentação das APIs**
+
 Abra o navegador e acesse:
 `Auth Service`
 ```
