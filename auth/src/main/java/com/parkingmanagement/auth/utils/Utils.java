@@ -41,4 +41,11 @@ public class Utils {
         }
         return phone;
     }
+
+    public static String getFirstName(String name) {
+        if (name == null || name.isEmpty()) {
+            return name;
+        }
+        return name.split(" ")[0];
+    }
 }

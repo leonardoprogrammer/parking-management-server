@@ -6,6 +6,7 @@ import com.parkingmanagement.auth.model.entity.User;
 import com.parkingmanagement.auth.service.EmailService;
 import com.parkingmanagement.auth.service.ResetPasswordService;
 import com.parkingmanagement.auth.service.UserService;
+import com.parkingmanagement.auth.utils.Utils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class ResetPasswordController {
 
         String resetLink = "http://localhost:4200/reset-password?email=" + email + "&id=" + savedResetPassword.getId();
 
-        emailservice.sendResetPasswordEmail(email, resetLink);
+        emailservice.sendResetPasswordEmail(email, Utils.getFirstName(user.getName()), resetLink);
 
         savedResetPassword.setSentEmail(true);
         savedResetPassword.setUpdatedAt(LocalDateTime.now());
@@ -90,6 +91,8 @@ public class ResetPasswordController {
         resetPassword.setDateReset(LocalDateTime.now());
         resetPassword.setUpdatedAt(LocalDateTime.now());
         resetPasswordService.save(resetPassword);
+
+        emailservice.sendPasswordResetConfirmationEmail(user.getEmail(), Utils.getFirstName(user.getName()));
 
         return ResponseEntity.ok("Senha redefinida com sucesso");
     }
