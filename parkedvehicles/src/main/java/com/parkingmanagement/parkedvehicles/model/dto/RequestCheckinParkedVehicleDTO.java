@@ -11,7 +11,7 @@ public class RequestCheckinParkedVehicleDTO {
     private String parkingId;
 
     @NotBlank(message = "'plate' é obrigatório")
-    @Size(max = 20, message = "'plate' deve ter no máximo 20 caracteres")
+    @Size(min = 7, max = 8, message = "'plate' deve ter 7 ou 8 caracteres")
     private String plate;
 
     @NotBlank(message = "'model' é obrigatório")

@@ -38,9 +38,9 @@ public class ParkingEmployeeController {
         this.securityService = securityService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getById(@PathVariable UUID id) {
-        ParkingEmployee parkingEmployee = parkingEmployeeService.findById(id).orElse(null);
+    @GetMapping("/{parkingEmployeeId}")
+    public ResponseEntity<Object> getById(@PathVariable UUID parkingEmployeeId) {
+        ParkingEmployee parkingEmployee = parkingEmployeeService.findById(parkingEmployeeId).orElse(null);
         if (parkingEmployee == null) {
             return ResponseEntity.notFound().build();
         }
@@ -96,19 +96,17 @@ public class ParkingEmployeeController {
 
         List<ParkingEmployee> employees = parkingEmployeeService.findEmployeesByParkingId(parkingId);
 
-        if (employees.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<BasicEmployeeDTO> basicEmployeeDTOS = new ArrayList<>();
-        for (ParkingEmployee employee : employees) {
-            User userEmployee = userService.findById(employee.getUserId()).orElse(null);
+        if (!employees.isEmpty()) {
+            for (ParkingEmployee employee : employees) {
+                User userEmployee = userService.findById(employee.getUserId()).orElse(null);
 
-            BasicEmployeeDTO basicEmployeeDTO = new BasicEmployeeDTO(
-                    employee.getId(),
-                    userEmployee.getName()
-            );
-            basicEmployeeDTOS.add(basicEmployeeDTO);
+                BasicEmployeeDTO basicEmployeeDTO = new BasicEmployeeDTO(
+                        employee.getId(),
+                        userEmployee.getName()
+                );
+                basicEmployeeDTOS.add(basicEmployeeDTO);
+            }
         }
 
         User owner = userService.findById(parking.getUserCreatorId()).orElse(null);
