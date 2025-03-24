@@ -6,6 +6,9 @@ import com.parkingmanagement.parkingmanagement.model.entity.Parking;
 import com.parkingmanagement.parkingmanagement.security.SecurityService;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
 import com.parkingmanagement.parkingmanagement.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,12 @@ public class ParkingController {
         this.securityService = securityService;
     }
 
+    @Operation(summary = "Obtém um estacionamento pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Estacionamento encontrado"),
+            @ApiResponse(responseCode = "404", description = "Estacionamento não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/{parkingId}")
     public ResponseEntity<Object> getById(@PathVariable UUID parkingId) {
         Parking parking = parkingService.findById(parkingId).orElse(null);
@@ -42,6 +51,11 @@ public class ParkingController {
         return ResponseEntity.ok(parking);
     }
 
+
+    @Operation(summary = "Obtém estacionamentos pelo ID do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Estacionamentos encontrados")
+    })
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Parking>> getByUserId(@PathVariable UUID userId) {
         List<Parking> parkings = new ArrayList<>();
@@ -56,6 +70,11 @@ public class ParkingController {
         return ResponseEntity.ok(parkings);
     }
 
+    @Operation(summary = "Registra um novo estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Estacionamento registrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Usuário não encontrado")
+    })
     @PostMapping
     public ResponseEntity<Object> register(@Valid @RequestBody RequestRegisterParkingDTO requestRegisterParkingDTO) {
         UUID userCreatorid = UUID.fromString(requestRegisterParkingDTO.getUserCreatorId());
@@ -71,6 +90,12 @@ public class ParkingController {
         return ResponseEntity.ok(savedParking);
     }
 
+    @Operation(summary = "Atualiza um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Estacionamento atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Estacionamento não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @PutMapping("/{parkingId}")
     public ResponseEntity<Object> update(@PathVariable UUID parkingId, @Valid @RequestBody RequestUpdateParkingDTO requestUpdateParkingDTO) {
         Parking parking = parkingService.findById(parkingId).orElse(null);
@@ -90,6 +115,12 @@ public class ParkingController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Deleta um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Estacionamento deletado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Estacionamento não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @DeleteMapping("/{parkingId}")
     public ResponseEntity<Object> delete(@PathVariable UUID parkingId) {
         Parking parking = parkingService.findById(parkingId).orElse(null);

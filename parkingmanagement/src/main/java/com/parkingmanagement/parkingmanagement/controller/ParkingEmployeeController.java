@@ -12,6 +12,9 @@ import com.parkingmanagement.parkingmanagement.service.ParkingEmployeeService;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
 import com.parkingmanagement.parkingmanagement.service.UserService;
 import com.parkingmanagement.parkingmanagement.utils.Utils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +41,12 @@ public class ParkingEmployeeController {
         this.securityService = securityService;
     }
 
+    @Operation(summary = "Retorna os detalhes de um funcionário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Funcionário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/{parkingEmployeeId}")
     public ResponseEntity<Object> getById(@PathVariable UUID parkingEmployeeId) {
         ParkingEmployee parkingEmployee = parkingEmployeeService.findById(parkingEmployeeId).orElse(null);
@@ -83,6 +92,12 @@ public class ParkingEmployeeController {
         return ResponseEntity.ok(responseDetailsEmployeeDTO);
     }
 
+    @Operation(summary = "Retorna a lista de funcionários de um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionários encontrados"),
+            @ApiResponse(responseCode = "400", description = "Estacionamento não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/parking/{parkingId}")
     public ResponseEntity<Object> getEmployeesByParkingId(@PathVariable UUID parkingId) {
         Parking parking = parkingService.findById(parkingId).orElse(null);
@@ -119,6 +134,12 @@ public class ParkingEmployeeController {
         return ResponseEntity.ok(responseListEmployeesDTO);
     }
 
+    @Operation(summary = "Adiciona um funcionário a um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionário adicionado"),
+            @ApiResponse(responseCode = "400", description = "Estacionamento ou usuário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @PostMapping
     public ResponseEntity<Object> add(@RequestParam UUID parkingId, @RequestParam UUID userId) {
         Parking parking = parkingService.findById(parkingId).orElse(null);
@@ -151,6 +172,12 @@ public class ParkingEmployeeController {
         return ResponseEntity.ok(savedParkingEmployee);
     }
 
+    @Operation(summary = "Desvincula funcionário de um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionário removido"),
+            @ApiResponse(responseCode = "400", description = "Estacionamento ou usuário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @PostMapping("/leave")
     public ResponseEntity<Object> leave(@RequestParam UUID parkingId, @RequestParam UUID userId) {
         User user = userService.findById(userId).orElse(null);
@@ -172,6 +199,12 @@ public class ParkingEmployeeController {
         return ResponseEntity.ok("Usuário removido do estacionamento");
     }
 
+    @Operation(summary = "Remove um funcionário de um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionário removido"),
+            @ApiResponse(responseCode = "400", description = "Funcionário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @DeleteMapping("/{parkingEmployeeId}")
     public ResponseEntity<Object> delete(@PathVariable UUID parkingEmployeeId) {
         ParkingEmployee parkingEmployee = parkingEmployeeService.findById(parkingEmployeeId).orElse(null);

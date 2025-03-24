@@ -11,6 +11,9 @@ import com.parkingmanagement.parkedvehicles.security.SecurityService;
 import com.parkingmanagement.parkedvehicles.security.SecurityUtils;
 import com.parkingmanagement.parkedvehicles.service.*;
 import com.parkingmanagement.parkedvehicles.utils.Utils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +46,12 @@ public class ParkedVehicleController {
         this.parkingFeeCalculatorService = parkingFeeCalculatorService;
     }
 
+    @Operation(summary = "Obtém um veículo estacionado pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Veículo estacionado encontrado"),
+            @ApiResponse(responseCode = "404", description = "Veículo estacionado não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/{parkedVehicleId}")
     public ResponseEntity<Object> getById(@PathVariable UUID parkedVehicleId) {
         ParkedVehicle parkedVehicle = parkedVehicleService.findById(parkedVehicleId).orElse(null);
@@ -79,6 +88,7 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(responseFullParkedVehicleDTO);
     }
 
+    @Operation(summary = "Obtém os detalhes do check-in de um veículo estacionado pelo ID do veículo")
     @GetMapping("/{parkedVehicleId}/checkin")
     public ResponseEntity<Object> getCheckinParkedVehicleById(@PathVariable UUID parkedVehicleId) {
         ParkedVehicle parkedVehicle = parkedVehicleService.findById(parkedVehicleId).orElse(null);
@@ -110,6 +120,12 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(responseCheckinParkedVehicleDTO);
     }
 
+    @Operation(summary = "Obtém veículos estacionados pelo ID do estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Veículos estacionados encontrados"),
+            @ApiResponse(responseCode = "404", description = "Veículos estacionados não encontrados"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/parking/{parkingId}")
     public ResponseEntity<List<ParkedVehicle>> getParkedVehiclesByParkingId(@PathVariable UUID parkingId) {
         List<ParkedVehicle> parkedVehicles = parkedVehicleService.findParkedVehiclesByParkingId(parkingId);
@@ -125,6 +141,12 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(parkedVehicles);
     }
 
+    @Operation(summary = "Obtém lista do histórico de veículos estacionados pelo ID do estacionamentoa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Histórico de veículos estacionados encontrado"),
+            @ApiResponse(responseCode = "404", description = "Histórico de veículos estacionados não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/history")
     public ResponseEntity<Object> getHistoryByParkingId(@RequestParam UUID parkingId, @RequestParam Integer page, @RequestParam Integer sizePage) {
         if (!parkingService.existsById(parkingId)) {
@@ -138,6 +160,12 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(parkedVehicleService.getParkedVehiclesHistoryByParkingId(parkingId, page, sizePage));
     }
 
+    @Operation(summary = "Obtém o total de páginas do histórico de veículos estacionados pelo ID do estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Total de páginas do histórico de veículos estacionados encontrado"),
+            @ApiResponse(responseCode = "404", description = "Total de páginas do histórico de veículos estacionados não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Acesso negado")
+    })
     @GetMapping("/history/totalPages")
     public ResponseEntity<Object> getTotalHistoryByParkingId(@RequestParam UUID parkingId, @RequestParam Integer sizePage) {
         if (!parkingService.existsById(parkingId)) {
@@ -151,6 +179,11 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(parkedVehicleService.getTotalPagesOfParkedVehiclesHistory(parkingId, sizePage));
     }
 
+    @Operation(summary = "Realiza o check-in de um veículo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Check-in realizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao realizar check-in")
+    })
     @PostMapping("/checkin")
     public ResponseEntity<Object> checkin(@Valid @RequestBody RequestCheckinParkedVehicleDTO requestCheckinParkedVehicleDTO) {
         UUID parkingId = UUID.fromString(requestCheckinParkedVehicleDTO.getParkingId());
@@ -200,6 +233,11 @@ public class ParkedVehicleController {
         return ResponseEntity.ok(savedParkedVehicle);
     }
 
+    @Operation(summary = "Realiza o checkout de um veículo estacionado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Checkout realizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao realizar checkout")
+    })
     @PostMapping("/checkout")
     public ResponseEntity<Object> checkout(@Valid @RequestBody RequestCheckoutParkedVehicleDTO requestCheckoutParkedVehicleDTO) {
         ParkedVehicle parkedVehicle = parkedVehicleService.findById(UUID.fromString(requestCheckoutParkedVehicleDTO.getParkedVehicleId())).orElse(null);

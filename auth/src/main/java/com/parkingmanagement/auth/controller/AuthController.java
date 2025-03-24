@@ -1,7 +1,13 @@
 package com.parkingmanagement.auth.controller;
 
+import com.parkingmanagement.auth.model.dto.RequestLoginDTO;
+import com.parkingmanagement.auth.model.dto.RequestRefreshTokenDTO;
 import com.parkingmanagement.auth.security.JwtService;
 import com.parkingmanagement.auth.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,10 +31,15 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
+    @Operation(summary = "Realiza login do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody RequestLoginDTO requestLoginDTO) {
+        String email = requestLoginDTO.getEmail();
+        String password = requestLoginDTO.getPassword();
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         String accessToken = jwtService.authenticate(email, password);
@@ -39,9 +50,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken, "userId", userId.toString()));
     }
 
+    @Operation(summary = "Atualiza o token de acesso e o token de atualização")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tokens atualizados com sucesso")
+    })
     @PostMapping("/refresh-token")
-    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
+    public ResponseEntity<Map<String, String>> refreshToken(@Valid @RequestBody RequestRefreshTokenDTO requestRefreshTokenDTO) {
+        String refreshToken = requestRefreshTokenDTO.getRefreshToken();
         String newAccessToken = jwtService.refreshAccessToken(refreshToken);
         String newRefreshToken = jwtService.generateRefreshToken(userService.loadUserByUsername(jwtService.extractUsername(refreshToken)));
         return ResponseEntity.ok(Map.of("newAccessToken", newAccessToken, "newRefreshToken", newRefreshToken));

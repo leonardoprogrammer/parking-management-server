@@ -9,6 +9,9 @@ import com.parkingmanagement.auth.service.ParkingEmployeeService;
 import com.parkingmanagement.auth.service.ParkingService;
 import com.parkingmanagement.auth.service.UserService;
 import com.parkingmanagement.auth.utils.Utils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -40,6 +43,11 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
+    @Operation(summary = "Obtém informações do usuário logado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Informações do usuário obtidas com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
     @GetMapping("/currentUser")
     public ResponseEntity<Object> getCurrentUser() {
         User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
@@ -61,6 +69,12 @@ public class UserController {
         return ResponseEntity.ok(responseUserDTO);
     }
 
+    @Operation(summary = "Busca usuários por parâmetros")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuários encontrados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Informe pelo menos um parâmetro de busca"),
+            @ApiResponse(responseCode = "404", description = "Usuários não encontrados")
+    })
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestParam UUID parkingId, @RequestParam String name, @RequestParam String email, @RequestParam String cpf) {
         if ((name == null || name.isBlank()) && (email == null || email.isBlank()) && (cpf == null || cpf.isBlank())) {
@@ -110,6 +124,11 @@ public class UserController {
         return ResponseEntity.ok(responseSearchUserDTOS);
     }
 
+    @Operation(summary = "Registra um novo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário registrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "E-mail ou CPF já cadastrados")
+    })
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody RequestRegisterUserDTO requestRegisterUserDTO) {
         if (userService.existsByEmail(requestRegisterUserDTO.getEmail())) {
@@ -128,6 +147,11 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
+    @Operation(summary = "Atualiza o usuário logado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
     @PutMapping("/currentUser")
     public ResponseEntity<Object> updateCurrentUser(@Valid @RequestBody RequestUpdateUserDTO requestUpdateUserDTO) {
         User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
@@ -144,6 +168,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Atualiza a senha do usuário logado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Senha atualizada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "406", description = "Senha atual inválida")
+    })
     @PutMapping("/changeCurrentUserPassword")
     public ResponseEntity<Object> changeCurrentUserPassword(@Valid @RequestBody RequestChangePasswordDTO requestChangePasswordDTO) {
         User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);
@@ -165,6 +195,13 @@ public class UserController {
         return ResponseEntity.ok(Map.of("newAccessToken", newAccessToken, "newRefreshToken", newRefreshToken));
     }
 
+    @Operation(summary = "Atualiza o e-mail do usuário logado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "E-mail atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "406", description = "E-mail atual inválido"),
+            @ApiResponse(responseCode = "409", description = "E-mail já cadastrado")
+    })
     @PutMapping("/changeCurrentUserEmail")
     public ResponseEntity<Object> changeCurrentUserEmail(@Valid @RequestBody RequestChangeEmailDTO requestChangeEmailDTO) {
         User user = userService.findByEmail(SecurityUtils.getCurrentUserEmail()).orElse(null);

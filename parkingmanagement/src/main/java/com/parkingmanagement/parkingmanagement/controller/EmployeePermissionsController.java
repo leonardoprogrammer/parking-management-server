@@ -10,6 +10,9 @@ import com.parkingmanagement.parkingmanagement.security.SecurityService;
 import com.parkingmanagement.parkingmanagement.service.EmployeePermissionsService;
 import com.parkingmanagement.parkingmanagement.service.ParkingEmployeeService;
 import com.parkingmanagement.parkingmanagement.service.ParkingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +37,12 @@ public class EmployeePermissionsController {
         this.securityservice = securityservice;
     }
 
+    @Operation(summary = "Retorna as permissões do usuário atual para um estacionamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Permissões retornadas com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Estacionamento ou usuário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para acessar as permissões do estacionamento")
+    })
     @GetMapping("/currentUser")
     public ResponseEntity<Object> getCurrentUserPermissions(@RequestParam UUID parkingId) {
         Parking parking = parkingService.findById(parkingId).orElse(null);
@@ -82,6 +91,12 @@ public class EmployeePermissionsController {
         return ResponseEntity.ok(permissionsDTO);
     }
 
+    @Operation(summary = "Atualiza as permissões de um funcionário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Permissões atualizadas com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Funcionário não encontrado"),
+            @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para atualizar as permissões do funcionário")
+    })
     @PutMapping
     public ResponseEntity<Object> updateEmployeePermissions(@Valid @RequestBody RequestEmployeePermissionsDTO requestEmployeePermissionsDTO,
                                                             @RequestParam UUID employeeId) {
