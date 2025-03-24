@@ -79,6 +79,7 @@ docker-compose up -d
 4. **Acesse a documentação das APIs**
 
 Abra o navegador e acesse:
+
 `Auth Service`
 ```
 http://localhost:8081/swagger-ui.html
