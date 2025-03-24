@@ -1,81 +1,45 @@
 # Parking Management System - Backend
 
-
-
-
-
-
-## Sobre o Projeto
-
-Este repositório contém a implementação do backend de um **sistema de gerenciamento de estacionamentos** baseado em **microsserviços**. O sistema possibilita o cadastro de estacionamentos, controle de vagas, entrada e saída de veículos, além da cobrança e pagamento de tarifas.
+O **Parking Management System - Backend** é o coração do projeto de gerenciamento de estacionamentos, implementado como um conjunto de **microsserviços**. Este repositório abrange a lógica de negócio e integrações essenciais para o funcionamento completo do sistema, como autenticação, gerenciamento de estacionamentos, controle de veículos, notificações e muito mais.
 
 🔗 **Repositório GitHub:** [Parking Management Server](https://github.com/leonardoprogrammer/parking-management-server)
 
-## Arquitetura
+---
 
-O projeto segue a arquitetura de **microsserviços** e está dividido nos seguintes serviços:
+## 🚀 Funcionalidades Principais
 
-- **Auth Service**: Responsável pela autenticação e gerenciamento de usuários.
-- **Gateway Service**: Proxy reverso que gerencia as requisições para os microsserviços.
-- **Notification Service**: Envio de notificações por e-mail e outros canais.
-- **Parked Vehicles Service**: Registro e gerenciamento de veículos estacionados.
-- **Parking Management Service**: Administração de estacionamentos e configurações.
+- **Autenticação e Gerenciamento de Usuários**  
+  Realiza cadastro, login, atualização e controle de usuários através do Auth Service.
 
-Cada serviço é um projeto separado baseado no **Spring Boot 3.4.2** e usa **PostgreSQL** como banco de dados.
+- **API Gateway Centralizado**  
+  Roteia e gerencia as requisições para os microsserviços, garantindo a segurança e a escalabilidade via Gateway Service.
 
-## Tecnologias Utilizadas
+- **Notificações**  
+  Envia alertas e e-mails para os usuários utilizando o Notification Service.
+
+- **Controle de Veículos Estacionados**  
+  Registra a entrada, saída e histórico de veículos através do Parked Vehicles Service.
+
+- **Administração de Estacionamentos**  
+  Permite o cadastro e gerenciamento de estacionamentos, bem como a configuração de tarifas, via Parking Management Service.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
 
 - **Java 17**
 - **Spring Boot 3.4.2**
-- **Spring Cloud** (Eureka, Config Server, API Gateway)
+- **Spring Cloud** (incluindo Eureka, Config Server e API Gateway)
 - **Spring Security & JWT**
 - **PostgreSQL**
 - **Docker & Docker Compose**
 - **Swagger OpenAPI**
 
-## Funcionalidades Principais
+---
 
-✅ Cadastro e autenticação de usuários com JWT
-✅ Gerenciamento de estacionamentos e permissões de funcionários
-✅ Controle de entrada e saída de veículos
-✅ Cálculo automático de tarifas com suporte a pagamentos via QRCode Pix
-✅ Suporte a múltiplos idiomas (Português, Inglês e Espanhol)
-✅ Suporte a temas claro e escuro
-✅ Microsserviço de notificações para envio de e-mails
-✅ API Gateway para roteamento e autenticação centralizada
+## 📂 Estrutura do Projeto
 
-## Instalação e Execução
-
-### Pré-requisitos
-
-- **Java 17** instalado
-- **Docker e Docker Compose**
-- **PostgreSQL**
-
-### Configuração
-
-1. Clone o repositório:
-
-   ```sh
-   git clone https://github.com/leonardoprogrammer/parking-management-server.git
-   cd parking-management-server
-   ```
-
-2. Configure as variáveis de ambiente nos arquivos `application.properties` de cada serviço.
-
-3. Execute os serviços com Docker Compose:
-
-   ```sh
-   docker-compose up -d
-   ```
-
-4. Acesse a documentação da API (Swagger UI) em:
-
-   ```sh
-   http://localhost:8080/swagger-ui.html
-   ```
-
-## Estrutura do Projeto
+A estrutura do repositório reflete a arquitetura de microsserviços, onde cada serviço é implementado como um projeto independente:
 
 ```
 parking-management-server/
@@ -89,36 +53,87 @@ parking-management-server/
 └── README.md
 ```
 
-## Endpoints Principais
+## ⚙️ Configuração e Execução
 
-### Autenticação
+### Pré-requisitos
+
+- **Java 17** instalado
+- **Docker e Docker Compose**
+- **PostgreSQL**
+
+### Passos para Configuração
+
+1. **Clone o repositório**:
+   ```bash
+   git clone https://github.com/leonardoprogrammer/parking-management-server.git
+   cd parking-management-server
+
+2. **Configure as variáveis de ambiente**
+Atualize os arquivos application.properties de cada serviço com as configurações necessárias (ex.: credenciais do banco de dados, porta, etc.).
+
+3. **Execute os serviços com Docker Compose**:
+```
+docker-compose up -d
+```
+
+4. **Acesse a documentação das APIs**
+Abra o navegador e acesse:
+`Auth Service`
+```
+http://localhost:8081/swagger-ui.html
+```
+`Parking Management Service`
+```
+http://localhost:8082/swagger-ui.html
+```
+`Parked Vehicle Service`
+```
+http://localhost:8083/swagger-ui.html
+```
+
+## 🌐 Endpoints Principais
+
+### Autenticação (Auth Service)
 
 - `POST /auth/login` - Realiza login e retorna tokens JWT.
 - `POST /auth/register` - Registra um novo usuário.
 - `POST /auth/refresh-token` - Atualiza tokens JWT.
 
-### Estacionamentos
+### Estacionamentos (Parking Management Service)
 
 - `POST /parking` - Cria um novo estacionamento.
 - `GET /parking/{id}` - Obtém detalhes de um estacionamento.
 - `PUT /parking/{id}` - Atualiza um estacionamento.
 
-### Veículos Estacionados
+### Veículos Estacionados (Parked Vehicles Service)
 
 - `POST /vehicles/checkin` - Registra entrada de veículo.
 - `POST /vehicles/checkout` - Registra saída de veículo e calcula a tarifa.
 - `GET /vehicles/history` - Histórico de veículos estacionados.
 
-## Contribuição
+## 🤝 Contribuição
 
-Contribuições são bem-vindas! Siga os passos:
+Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
 
-1. Fork o projeto
-2. Crie uma branch (`feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'Add nova funcionalidade'`)
-4. Envie um pull request
+1. Faça um fork do projeto.
+2. Crie uma branch para sua feature:
+   ```bash
+   git checkout -b minha-feature
+   ```
+3. Commit suas alterações:
+   ```bash
+   git commit -m "Minha nova feature"
+   ```
+4. Envie para o repositório remoto:
+   ```bash
+   git push origin minha-feature
+   ```
+5. Abra um Pull Request.
 
-## Licença
+---
 
-Este projeto está licenciado sob a **MIT License**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+## 📝 Licença
 
+Este projeto está licenciado sob a [MIT License](LICENSE).
+
+---
