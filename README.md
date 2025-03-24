@@ -43,12 +43,12 @@ A estrutura do repositório reflete a arquitetura de microsserviços, onde cada 
 
 ```
 parking-management-server/
-├── auth/             # Serviço de autenticação
-├── gateway/          # API Gateway
-├── notification/     # Serviço de notificações
-├── parkedvehicles/   # Controle de veículos estacionados
-├── parkingmanagement/# Administração de estacionamentos
-├── database/         # Scripts SQL para criação do banco
+├── auth/               # Serviço de autenticação
+├── gateway/            # API Gateway
+├── notification/       # Serviço de notificações
+├── parkedvehicles/     # Controle de veículos estacionados
+├── parkingmanagement/  # Administração de estacionamentos
+├── database/           # Scripts SQL para criação do banco
 ├── docker-compose.yml
 └── README.md
 ```
@@ -82,36 +82,36 @@ Abra o navegador e acesse:
 
 `Auth Service`
 ```
-http://localhost:8081/swagger-ui.html
+http://localhost:8081/api/swagger-ui.html
 ```
 `Parking Management Service`
 ```
-http://localhost:8082/swagger-ui.html
+http://localhost:8082/api/swagger-ui.html
 ```
 `Parked Vehicle Service`
 ```
-http://localhost:8083/swagger-ui.html
+http://localhost:8083/api/swagger-ui.html
 ```
 
 ## 🌐 Endpoints Principais
 
 ### Autenticação (Auth Service)
 
-- `POST /auth/login` - Realiza login e retorna tokens JWT.
-- `POST /auth/register` - Registra um novo usuário.
-- `POST /auth/refresh-token` - Atualiza tokens JWT.
+- `POST /api/auth/login` - Realiza login e retorna tokens JWT.
+- `POST /api/auth/register` - Registra um novo usuário.
+- `POST /api/auth/refresh-token` - Atualiza tokens JWT.
 
 ### Estacionamentos (Parking Management Service)
 
-- `POST /parking` - Cria um novo estacionamento.
-- `GET /parking/{id}` - Obtém detalhes de um estacionamento.
-- `PUT /parking/{id}` - Atualiza um estacionamento.
+- `POST /api/parking` - Cria um novo estacionamento.
+- `GET /api/parking/{id}` - Obtém detalhes de um estacionamento.
+- `PUT /api/parking/{id}` - Atualiza um estacionamento.
 
 ### Veículos Estacionados (Parked Vehicles Service)
 
-- `POST /vehicles/checkin` - Registra entrada de veículo.
-- `POST /vehicles/checkout` - Registra saída de veículo e calcula a tarifa.
-- `GET /vehicles/history` - Histórico de veículos estacionados.
+- `POST /api/vehicles/checkin` - Registra entrada de veículo.
+- `POST /api/vehicles/checkout` - Registra saída de veículo e calcula a tarifa.
+- `GET /api/vehicles/history` - Histórico de veículos estacionados.
 
 ## 🤝 Contribuição
 
