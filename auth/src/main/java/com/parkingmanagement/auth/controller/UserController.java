@@ -10,6 +10,7 @@ import com.parkingmanagement.auth.service.ParkingService;
 import com.parkingmanagement.auth.service.UserService;
 import com.parkingmanagement.auth.utils.Utils;
 import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -107,6 +108,24 @@ public class UserController {
         }
 
         return ResponseEntity.ok(responseSearchUserDTOS);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<User> register(@Valid @RequestBody RequestRegisterUserDTO requestRegisterUserDTO) {
+        if (userService.existsByEmail(requestRegisterUserDTO.getEmail())) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (userService.existsByCpf(requestRegisterUserDTO.getCpf())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        User newUser = new User();
+        BeanUtils.copyProperties(requestRegisterUserDTO, newUser);
+        newUser.setPassword(passwordEncoder.encode(requestRegisterUserDTO.getPassword()));
+
+        User savedUser = userService.save(newUser);
+
+        return ResponseEntity.ok(savedUser);
     }
 
     @PutMapping("/currentUser")
