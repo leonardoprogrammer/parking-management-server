@@ -1,0 +1,51 @@
+services:
+  auth-service:
+    image: auth-service:latest
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/parkingmanagement
+      SPRING_DATASOURCE_USERNAME: parkingmanagement-development
+      SPRING_DATASOURCE_PASSWORD: 1234development5678
+    depends_on:
+      - db
+      
+  parkingmanagement-service:
+    image: parkingmanagement-service:latest
+    build:
+      context: ./parkingmanagement
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/parkingmanagement
+      SPRING_DATASOURCE_USERNAME: parkingmanagement-development
+      SPRING_DATASOURCE_PASSWORD: 1234development5678
+    depends_on:
+      - db
+
+  parkedvehicles-service:
+    image: parkedvehicles-service:latest
+    build:
+      context: ./parkedvehicles
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/parkingmanagement
+      SPRING_DATASOURCE_USERNAME: parkingmanagement-development
+      SPRING_DATASOURCE_PASSWORD: 1234development5678
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: parkingmanagement
+      POSTGRES_USER: parkingmanagement-development
+      POSTGRES_PASSWORD: 1234development5678
+    ports:
+      - "5432:5432"
