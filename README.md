@@ -2,7 +2,7 @@
 
 O **Parking Management Server** é o coração do projeto de gerenciamento de estacionamentos, implementado como um conjunto de **microsserviços**. Este repositório abrange a lógica de negócio e integrações essenciais para o funcionamento completo do sistema, como autenticação, gerenciamento de estacionamentos, controle de veículos, notificações e muito mais.
 
-🔗 **Repositório GitHub:** [Parking Management Server](https://github.com/leonardoprogrammer/parking-management-server)
+🔗 **Repositório da aplicação web:** [Parking Management Web App](https://github.com/leonardoprogrammer/parking-management-web-app)
 
 ---
 
@@ -57,7 +57,7 @@ parking-management-server/
 
 ### Pré-requisitos
 
-- **Java 17** instalado
+- **Java 17**
 - **Docker e Docker Compose**
 - **PostgreSQL**
 
