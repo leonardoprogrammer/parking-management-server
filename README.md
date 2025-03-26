@@ -50,6 +50,7 @@ parking-management-server/
 ├── parkingmanagement/  # Administração de estacionamentos
 ├── database/           # Scripts SQL para criação do banco
 ├── docker-compose.yml
+├── LICENSE
 └── README.md
 ```
 
