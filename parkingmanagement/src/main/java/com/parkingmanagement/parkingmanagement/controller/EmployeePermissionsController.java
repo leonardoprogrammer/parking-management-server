@@ -66,6 +66,7 @@ public class EmployeePermissionsController {
                     true,
                     true,
                     true,
+                    true,
                     true
             );
         } else {
@@ -76,10 +77,12 @@ public class EmployeePermissionsController {
                         employeePermissions.isCanCheckinVehicle(),
                         employeePermissions.isCanCheckoutVehicle(),
                         employeePermissions.isCanAddEmployee(),
-                        employeePermissions.isCanEditParking()
+                        employeePermissions.isCanEditParking(),
+                        false
                 );
             } else {
                 permissionsDTO = new PermissionsDTO(
+                        false,
                         false,
                         false,
                         false,
