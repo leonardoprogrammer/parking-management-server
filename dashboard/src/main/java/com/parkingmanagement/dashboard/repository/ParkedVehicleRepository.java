@@ -1,6 +1,7 @@
 package com.parkingmanagement.dashboard.repository;
 
 import com.parkingmanagement.dashboard.model.entity.ParkedVehicle;
+import com.parkingmanagement.dashboard.model.vo.ParkedVehicleBasicVO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -20,9 +21,8 @@ public interface ParkedVehicleRepository extends JpaRepository<ParkedVehicle, UU
     @Query("SELECT COUNT(p) FROM ParkedVehicle p WHERE p.parkingId = :parkingId AND p.checkoutDate BETWEEN :startDate AND :endDate")
     Integer countCheckOut(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate);
 
-    @Query("SELECT DATE(p.entryDate), COUNT(p) FROM ParkedVehicle p WHERE p.parkingId = :parkingId AND p.entryDate BETWEEN :startDate AND :endDate GROUP BY DATE(p.entryDate)")
-    List<Object[]> getCheckInDataGroupedByDate(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate);
-
-    @Query("SELECT DATE(p.checkoutDate), SUM(p.amountPaid) FROM ParkedVehicle p WHERE p.parkingId = :parkingId AND p.checkoutDate BETWEEN :startDate AND :endDate AND p.paid = true GROUP BY DATE(p.checkoutDate)")
-    List<Object[]> getRevenueDataGroupedByDate(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate);
+    @Query("SELECT new com.parkingmanagement.dashboard.model.vo.ParkedVehicleBasicVO(p.entryDate, p.amountPaid) " +
+            "FROM ParkedVehicle p " +
+            "WHERE p.parkingId = :parkingId AND p.entryDate BETWEEN :startDate AND :endDate AND p.paid = true")
+    List<ParkedVehicleBasicVO> getParkedVehicleWithCheckInAndRevenue(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate);
 }

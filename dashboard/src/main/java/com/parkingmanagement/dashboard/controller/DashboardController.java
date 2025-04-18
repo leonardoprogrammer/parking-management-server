@@ -2,6 +2,7 @@ package com.parkingmanagement.dashboard.controller;
 
 import com.parkingmanagement.dashboard.enums.DashboardFilterEnum;
 import com.parkingmanagement.dashboard.model.dto.*;
+import com.parkingmanagement.dashboard.model.vo.ParkedVehicleBasicVO;
 import com.parkingmanagement.dashboard.security.SecurityService;
 import com.parkingmanagement.dashboard.service.ParkedVehicleService;
 import com.parkingmanagement.dashboard.service.ParkingService;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -89,8 +90,8 @@ public class DashboardController {
             @ApiResponse(responseCode = "200", description = "Gráfico retornado com sucesso"),
             @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para acessar o gráfico do estacionamento")
     })
-    @GetMapping("/{parkingId}/chart")
-    public ResponseEntity<Object> getChart(@PathVariable UUID parkingId, @RequestParam String filter) {
+    @GetMapping("/{parkingId}/chart/tower/checkins-and-earnings")
+    public ResponseEntity<Object> getCheckinsAndEarningsTowerChart(@PathVariable UUID parkingId, @RequestParam String filter) {
         if (!parkingService.existsByUserCreatorIdAndId(securityService.getCurrentUser().getId(), parkingId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -123,37 +124,55 @@ public class DashboardController {
                 break;
         }
 
-        // Recuperar dados agrupados por data
-        List<Object[]> checkInData = parkedVehicleService.getCheckInDataGroupedByDate(parkingId, startDate, endDate);
-        List<Object[]> revenueData = parkedVehicleService.getRevenueDataGroupedByDate(parkingId, startDate, endDate);
+        List<ParkedVehicleBasicVO> parkedVehicleBasicVOList = parkedVehicleService.getParkedVehicleWithCheckInAndRevenue(parkingId, startDate, endDate);
 
-        // Mapear os dados para os DTOs
-        List<TowerChartItemDTO> items = checkInData.stream().map(data -> {
-            Date date = (Date) data[0];
-            Long checkInCount = (Long) data[1];
-            BigDecimal revenue = revenueData.stream()
-                    .filter(r -> r[0].equals(date))
-                    .map(r -> (BigDecimal) r[1])
-                    .findFirst()
-                    .orElse(BigDecimal.ZERO);
+        // define formato de data
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            return new TowerChartItemDTO(
-                    date.toString(),
-                    List.of(
-                            new TowerDTO(1, checkInCount),
-                            new TowerDTO(2, revenue)
-                    )
-            );
-        }).toList();
+        // agrupa pelo "entryDate" e ordena por data
+        Map<LocalDateTime, List<ParkedVehicleBasicVO>> groupedByDate = parkedVehicleBasicVOList.stream()
+                .collect(Collectors.groupingBy(ParkedVehicleBasicVO::getEntryDate));
 
-        TowerChartDTO towerChartDTO = new TowerChartDTO(
-                List.of(
-                        new TowerCategoryDTO(1, "Check-ins", "#008DFF"),
-                        new TowerCategoryDTO(2, "Ganhos", "#00FF37")
-                ),
-                items
-        );
+        // Sort the grouped data by entryDate
+        List<Map.Entry<LocalDateTime, List<ParkedVehicleBasicVO>>> sortedEntries = groupedByDate.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(towerChartDTO);
+        List<String> labels = new ArrayList<>();
+        List<Object> checkInsData = new ArrayList<>();
+        List<Object> revenueData = new ArrayList<>();
+
+        // popula labels e datasets
+        for (Map.Entry<LocalDateTime, List<ParkedVehicleBasicVO>> entry : sortedEntries) {
+            LocalDateTime date = entry.getKey();
+            List<ParkedVehicleBasicVO> vehicles = entry.getValue();
+
+            labels.add(date.format(formatter)); // Format date as dd/MM/yyyy
+            checkInsData.add(vehicles.size());
+            revenueData.add(vehicles.stream()
+                    .map(ParkedVehicleBasicVO::getAmountPaid)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+        }
+
+        // cria os datasets
+        DatasetDTO checkInsDataset = new DatasetDTO();
+        checkInsDataset.setLabel("Check-ins");
+        checkInsDataset.setData(checkInsData);
+        checkInsDataset.setBackgroundColor("#007bff");
+
+        DatasetDTO revenueDataset = new DatasetDTO();
+        revenueDataset.setLabel("Ganhos");
+        revenueDataset.setData(revenueData);
+        revenueDataset.setBackgroundColor("#28a745");
+
+        // adiciona datasets à lista
+        List<DatasetDTO> datasets = new ArrayList<>();
+        datasets.add(checkInsDataset);
+        datasets.add(revenueDataset);
+
+        ResponseTowerChartDTO responseTowerChartDTO = new ResponseTowerChartDTO(labels, datasets);
+
+        return ResponseEntity.ok(responseTowerChartDTO);
     }
 }

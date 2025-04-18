@@ -1,5 +1,6 @@
 package com.parkingmanagement.dashboard.service;
 
+import com.parkingmanagement.dashboard.model.vo.ParkedVehicleBasicVO;
 import com.parkingmanagement.dashboard.repository.ParkedVehicleRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +30,7 @@ public class ParkedVehicleService {
         return parkedVehicleRepository.countCheckOut(parkingId, startDate, endDate);
     }
 
-    public List<Object[]> getCheckInDataGroupedByDate(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate) {
-        return parkedVehicleRepository.getCheckInDataGroupedByDate(parkingId, startDate, endDate);
-    }
-
-    public List<Object[]> getRevenueDataGroupedByDate(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate) {
-        return parkedVehicleRepository.getRevenueDataGroupedByDate(parkingId, startDate, endDate);
+    public List<ParkedVehicleBasicVO> getParkedVehicleWithCheckInAndRevenue(UUID parkingId, LocalDateTime startDate, LocalDateTime endDate) {
+        return parkedVehicleRepository.getParkedVehicleWithCheckInAndRevenue(parkingId, startDate, endDate);
     }
 }
