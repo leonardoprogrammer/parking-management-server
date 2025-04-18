@@ -1,27 +1,25 @@
 package com.parkingmanagement.dashboard.model.dto;
 
-import java.math.BigDecimal;
-
 public class ResponseFilteredCardsDTO {
 
-    private BigDecimal revenue;
+    private String revenue;
     private Integer checkInQuantity;
     private Integer checkOutQuantity;
 
     public ResponseFilteredCardsDTO() {
     }
 
-    public ResponseFilteredCardsDTO(BigDecimal revenue, Integer checkInQuantity, Integer checkOutQuantity) {
+    public ResponseFilteredCardsDTO(String revenue, Integer checkInQuantity, Integer checkOutQuantity) {
         this.revenue = revenue;
         this.checkInQuantity = checkInQuantity;
         this.checkOutQuantity = checkOutQuantity;
     }
 
-    public BigDecimal getRevenue() {
+    public String getRevenue() {
         return revenue;
     }
 
-    public void setRevenue(BigDecimal revenue) {
+    public void setRevenue(String revenue) {
         this.revenue = revenue;
     }
 

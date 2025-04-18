@@ -6,6 +6,7 @@ import com.parkingmanagement.dashboard.model.vo.ParkedVehicleBasicVO;
 import com.parkingmanagement.dashboard.security.SecurityService;
 import com.parkingmanagement.dashboard.service.ParkedVehicleService;
 import com.parkingmanagement.dashboard.service.ParkingService;
+import com.parkingmanagement.dashboard.utils.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -77,7 +78,7 @@ public class DashboardController {
         Integer checkOutQuantity = parkedVehicleService.getCheckOutQuantity(parkingId, startDate, endDate);
 
         ResponseFilteredCardsDTO filteredCardsDTO = new ResponseFilteredCardsDTO(
-                revenue,
+                Utils.formatBigDecimalToCurrency(revenue),
                 checkInQuantity,
                 checkOutQuantity
         );
