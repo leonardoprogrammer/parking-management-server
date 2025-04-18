@@ -126,36 +126,41 @@ public class DashboardController {
 
         List<ParkedVehicleBasicVO> parkedVehicleBasicVOList = parkedVehicleService.getParkedVehicleWithCheckInAndRevenue(parkingId, startDate, endDate);
 
-        // define formato de data
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter;
+        Map<String, List<ParkedVehicleBasicVO>> groupedByKey;
 
-        // agrupa pelo "entryDate" e ordena por data
-        Map<LocalDateTime, List<ParkedVehicleBasicVO>> groupedByDate = parkedVehicleBasicVOList.stream()
-                .collect(Collectors.groupingBy(ParkedVehicleBasicVO::getEntryDate));
-
-        // Sort the grouped data by entryDate
-        List<Map.Entry<LocalDateTime, List<ParkedVehicleBasicVO>>> sortedEntries = groupedByDate.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toList());
+        if (filterEnum == DashboardFilterEnum.TODAY || filterEnum == DashboardFilterEnum.YESTERDAY) {
+            formatter = DateTimeFormatter.ofPattern("HH:mm");
+            groupedByKey = parkedVehicleBasicVOList.stream()
+                    .collect(Collectors.groupingBy(vo -> vo.getEntryDate().format(formatter)));
+        } else if (filterEnum == DashboardFilterEnum.ALL) {
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            groupedByKey = parkedVehicleBasicVOList.stream()
+                    .collect(Collectors.groupingBy(vo -> vo.getEntryDate().toLocalDate().format(formatter)));
+        } else {
+            formatter = DateTimeFormatter.ofPattern("dd/MM");
+            groupedByKey = parkedVehicleBasicVOList.stream()
+                    .collect(Collectors.groupingBy(vo -> vo.getEntryDate().toLocalDate().format(formatter)));
+        }
 
         List<String> labels = new ArrayList<>();
         List<Object> checkInsData = new ArrayList<>();
         List<Object> revenueData = new ArrayList<>();
 
-        // popula labels e datasets
-        for (Map.Entry<LocalDateTime, List<ParkedVehicleBasicVO>> entry : sortedEntries) {
-            LocalDateTime date = entry.getKey();
-            List<ParkedVehicleBasicVO> vehicles = entry.getValue();
+        groupedByKey.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()) // Sort by key
+                .forEach(entry -> {
+                    String key = entry.getKey();
+                    List<ParkedVehicleBasicVO> vehicles = entry.getValue();
 
-            labels.add(date.format(formatter)); // Format date as dd/MM/yyyy
-            checkInsData.add(vehicles.size());
-            revenueData.add(vehicles.stream()
-                    .map(ParkedVehicleBasicVO::getAmountPaid)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add));
-        }
+                    labels.add(key);
+                    checkInsData.add(vehicles.size());
+                    revenueData.add(vehicles.stream()
+                            .map(ParkedVehicleBasicVO::getAmountPaid)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add));
+                });
 
-        // cria os datasets
         DatasetDTO checkInsDataset = new DatasetDTO();
         checkInsDataset.setLabel("Check-ins");
         checkInsDataset.setData(checkInsData);
@@ -166,7 +171,6 @@ public class DashboardController {
         revenueDataset.setData(revenueData);
         revenueDataset.setBackgroundColor("#28a745");
 
-        // adiciona datasets à lista
         List<DatasetDTO> datasets = new ArrayList<>();
         datasets.add(checkInsDataset);
         datasets.add(revenueDataset);
